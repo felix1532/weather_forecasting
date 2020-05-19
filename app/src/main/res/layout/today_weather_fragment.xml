@@ -6,8 +6,12 @@
     tools:context=".ui.weather.todayWeather.TodayWeatherFragment">
 
     <TextView
+        android:id="@+id/temperature"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20dp"
+        android:layout_marginTop="90dp"
         android:text="@string/todayWeatherForecasting" />
 
 </FrameLayout>
