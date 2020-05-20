@@ -5,15 +5,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity"
-
+    android:background="@drawable/background"
     >
+
+    <RelativeLayout
+        android:id="@+id/loader_main_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/loader"
+            android:layout_width="@dimen/loader_width_height"
+            android:layout_height="@dimen/loader_width_height"
+            android:src="@drawable/loader" />
+    </RelativeLayout>
+
+
+<RelativeLayout
+    android:id="@+id/today_weather_main_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible">
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorPrimary"
+        android:background="@drawable/gradient_nav_menu_angle90"
         android:theme="@style/ToolbarTheme"
+
         />
 
     <fragment
@@ -24,13 +48,41 @@
         android:layout_above="@+id/bottom_nav"
         android:name="androidx.navigation.fragment.NavHostFragment"
         app:navGraph="@navigation/mobile_navigation"
-        app:defaultNavHost="true" />
+        app:defaultNavHost="true"
+        />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:itemTextColor="@color/colorWhite"
         app:menu="@menu/bottom_nav"
-        android:layout_alignParentBottom="true"/>
+        android:background="@drawable/gradient_nav_menu_angle270"
+        android:layout_alignParentBottom="true"
+        app:itemRippleColor="@color/colorPrimaryDark"
+
+        />
+
+</RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/retry_main_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/retry_btn"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:drawableTop="@drawable/error"
+            android:gravity="center"
+            android:text="@string/retry"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/retry_text_size" />
+    </RelativeLayout>
 
 </RelativeLayout>

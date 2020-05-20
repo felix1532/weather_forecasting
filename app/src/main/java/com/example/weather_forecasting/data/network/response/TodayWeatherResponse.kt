@@ -1,7 +1,7 @@
-package com.example.weather_forecasting.data.response
+package com.example.weather_forecasting.data.network.response
 
+import com.example.weather_forecasting.data.db.entity.*
 
-import com.google.gson.annotations.SerializedName
 
 data class TodayWeatherResponse(
     val base: String,

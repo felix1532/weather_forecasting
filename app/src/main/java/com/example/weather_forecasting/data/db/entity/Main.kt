@@ -1,4 +1,4 @@
-package com.example.weather_forecasting.data.response
+package com.example.weather_forecasting.data.db.entity
 
 
 import com.google.gson.annotations.SerializedName
@@ -10,9 +10,7 @@ data class Main(
     val pressure: Int,
     val temp: Double,
     @SerializedName("temp_max")
-    val tempMax: Int,
+    val tempMax: Double,
     @SerializedName("temp_min")
     val tempMin: Double
-
-
 )
