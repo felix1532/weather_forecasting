@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
 
-        loaderMainViewRL = findViewById(R.id.loader_main_view)
-        loaderIV = findViewById(R.id.loader)
+//        loaderMainViewRL = findViewById(R.id.loader_main_view)
+  //      loaderIV = findViewById(R.id.loader)
         errorViewRL = findViewById(R.id.retry_main_view)
 
         navController = Navigation.findNavController(this,R.id.nav_host_fragment)

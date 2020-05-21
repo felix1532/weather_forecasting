@@ -1,17 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.weather.todayWeather.TodayWeatherFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.weather.todayWeather.TodayWeatherFragment"
+    android:background="@drawable/background">
 
-    <TextView
-        android:id="@+id/temperature"
+
+
+    <RelativeLayout
+        android:id="@+id/today_weather_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="@color/colorWhite"
-        android:textSize="20dp"
-        android:layout_marginTop="90dp"
-        android:text="@string/todayWeatherForecasting" />
+        android:visibility="visible">
 
-</FrameLayout>
+
+        <TextView
+            android:id="@+id/textView_condition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            tools:text="Patchy rain possible"
+            android:textColor="@color/colorWhite"/>
+
+        <ImageView
+            android:id="@+id/imageView_condition_icon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="90dp"
+            tools:src="@drawable/sun"
+            android:layout_below="@id/textView_condition"/>
+
+
+        <TextView
+            android:id="@+id/textView_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/imageView_condition_icon"
+            android:layout_marginTop="100dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline2"
+            tools:text="25.0°C"
+            android:layout_marginLeft="40dp"
+            android:textColor="@color/colorWhite"
+            android:layout_below="@id/textView_condition"/>
+
+
+        <TextView
+            android:id="@+id/textView_feels_like_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:layout_below="@+id/textView_temperature"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="10dp"
+            tools:text="Feels like 20.4°C"
+            android:textSize="25dp"
+            android:textColor="@color/colorWhite"/>
+
+        <TextView
+            android:id="@+id/textView_wind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_below="@id/textView_feels_like_temperature"
+            android:layout_marginTop="60dp"
+            android:layout_marginStart="20dp"
+            tools:text="Wind: SE, 5.3 m/s"
+            android:textColor="@color/colorWhite"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/text_view_clouds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_below="@id/textView_wind"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="60dp"
+            tools:text="Clouds: 60 %"
+            android:textColor="@color/colorWhite"
+            android:textSize="20dp"/>
+
+        <TextView
+            android:id="@+id/textView_humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_below="@id/textView_feels_like_temperature"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="90dp"
+            tools:text="Humidity: 10 m/s"
+            android:textColor="@color/colorWhite"
+            android:textSize="20dp"/>
+
+
+    </RelativeLayout>
+
+
+
+
+
+
+
+</RelativeLayout>
