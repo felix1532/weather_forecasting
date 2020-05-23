@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <resources>
+        <string name="app_name" translatable="false">Прогноз погоды</string>
+        <string name="todayWeatherForecasting" translatable="false">Сегодня</string>
+        <string name="weekWeatherForecasting" translatable="false">5 дней</string>
+        <string name="setting" translatable="false">Настройки</string>
+
+        <string name="feels_like" translatable="false">Ощущается как</string>
+        <string name="wind" translatable="false">Ветер</string>
+        <string name="humidity" translatable="false">Влажность</string>
+        <string name="clouds" translatable="false">Облачность</string>
+
+        <string name="weather_location" translatable="false">Местоположение</string>
+        <string name="use_device_location" translatable="false">Использовать местопожение устройства</string>
+        <string name="get_your_location" translatable="false">Разрешить приложению использовать ваше местоположение</string>
+        <string name="location" translatable="false">Местоположение</string>
+        <string name="location_for_displayed" translatable="false">Местоположение для которого отображается погода</string>
+        <string name="language" translatable="false">Язык</string>
+        <string name="language_system" translatable="false">Язык приложения</string>
+
+        <string name="today" translatable="false">Сегодня</string>
+        <string name="tomorrow" translatable="false">Завтра</string>
+        <string name="default_city" translatable="false">Бенгалуру</string>
+        <string name="retry" translatable="false">Повторить</string>
+        <string name="invalid_city" translatable="false">Неверно введенный город</string>
+
+
+    </resources>
+

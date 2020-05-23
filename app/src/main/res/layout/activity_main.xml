@@ -15,7 +15,7 @@
     android:id="@+id/today_weather_main_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="visible">
+    android:visibility="gone">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -57,7 +57,7 @@
         android:id="@+id/retry_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/retry_btn"
+        android:background="@drawable/background"
         android:visibility="gone">
 
         <TextView
@@ -71,5 +71,7 @@
             android:textColor="@android:color/white"
             android:textSize="@dimen/retry_text_size" />
     </RelativeLayout>
+
+
 
 </RelativeLayout>

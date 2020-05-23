@@ -19,6 +19,8 @@ class ConnectivityInterceptionImpl(
         return  chain.proceed(chain.request())
     }
 
+
+
     private fun isOnline():Boolean{
         val  connectivityManager = appContext.getSystemService(Context.CONNECTIVITY_SERVICE)
         as ConnectivityManager
