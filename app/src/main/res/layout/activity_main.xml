@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity"
-    android:background="@drawable/background"
+    android:background="@drawable/bg_gradien"
+    android:animateLayoutChanges="true"
     >
-
 
 
 
@@ -22,7 +22,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient_nav_menu_angle90"
+        android:background="@color/Transparent"
         android:theme="@style/ToolbarTheme"
 
         />
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         app:itemTextColor="@color/colorWhite"
         app:menu="@menu/bottom_nav"
-        android:background="@drawable/gradient_nav_menu_angle270"
+        android:background="@drawable/bg_gradien_reverse"
         android:layout_alignParentBottom="true"
         app:itemRippleColor="@color/colorPrimaryDark"
 
@@ -57,7 +57,7 @@
         android:id="@+id/retry_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background"
+
         android:visibility="gone">
 
         <TextView

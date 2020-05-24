@@ -28,17 +28,7 @@ abstract class ScopeFragment : Fragment(),CoroutineScope{
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         job =Job()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
     }
 
 

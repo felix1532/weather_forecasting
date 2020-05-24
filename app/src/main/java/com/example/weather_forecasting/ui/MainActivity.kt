@@ -1,39 +1,39 @@
 package com.example.weather_forecasting.ui
 
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
-import android.content.res.Configuration
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.net.ConnectivityManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.widget.*
-import androidx.fragment.app.Fragment
+import android.widget.RelativeLayout
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.weather_forecasting.R
-import com.example.weather_forecasting.data.db.entity.provider.LanguageProvider
-import com.example.weather_forecasting.data.db.entity.provider.LanguageProviderImpl
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.OnSuccessListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
+import kotlinx.coroutines.Runnable
+import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var navController: NavController
-    private lateinit var todayWeatherMainView:RelativeLayout
-    lateinit var loaderMainViewRL: RelativeLayout
-    lateinit var loaderIV: ImageView
-    lateinit var weatherForecastViewLL: LinearLayout
-    lateinit var temperatureTV: TextView
-    lateinit var cityNameTV: TextView
-
+    lateinit var navController: NavController
+    lateinit var todayWeatherMainView:RelativeLayout
     lateinit var errorViewRL: RelativeLayout
-    lateinit var searchCityET: EditText
-    lateinit var activity: MainActivity
 
+    lateinit var today_weather_main_view: RelativeLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,8 +42,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
 
-//      loaderMainViewRL = findViewById(R.id.loader_main_view)
-  //    loaderIV = findViewById(R.id.loader)
+        today_weather_main_view = findViewById(R.id.today_weather_main_view)
         errorViewRL = findViewById(R.id.retry_main_view)
         todayWeatherMainView = findViewById(R.id.today_weather_main_view)
 
@@ -55,6 +54,17 @@ class MainActivity : AppCompatActivity() {
             NavigationUI.setupActionBarWithNavController(this,navController)
         }else{
             errorViewRL.visibility = View.VISIBLE
+
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        errorViewRL.setOnClickListener {
+
+            if(isOnline()){
+                recreate()
+            }else Toast.makeText(this,resources.getString(R.string.turn_internet),Toast.LENGTH_LONG).show()
         }
 
 
@@ -66,27 +76,7 @@ class MainActivity : AppCompatActivity() {
         val  networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo !=null && networkInfo.isConnected
     }
-/*
 
-    override fun handleLoaderView(showHandleLoader: Boolean) {
-        if (showHandleLoader) {
-            val rotation = AnimationUtils.loadAnimation(activity, R.anim.rotate)
-            rotation.repeatCount = Animation.INFINITE
-            rotation.repeatMode = Animation.RESTART
-            loaderIV.startAnimation(rotation)
-            loaderMainViewRL.visibility = View.VISIBLE
-        } else {
-            loaderMainViewRL.visibility = View.GONE
-        }
-    }
 
-    override fun handleErrorView(showErrorView: Boolean) {
-        errorViewRL.visibility = if (showErrorView) View.VISIBLE else View.GONE
-    }
-*/
-    //clouds - облачность в процентах
-    //wind.speed - скорость ветра
-    //main.temp -температура
-    //main.feels_like - ощущается температура человеком
-    //main.humidity - влажностьй
+
 }

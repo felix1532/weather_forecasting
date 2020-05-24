@@ -3,11 +3,16 @@
     <string name="todayWeatherForecasting" translatable="false">Today</string>
     <string name="weekWeatherForecasting" translatable="false">5 Days</string>
     <string name="setting" translatable="false">Settings</string>
+    <string name="turn_internet" translatable="false">Turn on the Internet</string>
 
     <string name="feels_like" translatable="false">Feels Like</string>
     <string name="wind" translatable="false">Wind</string>
     <string name="humidity" translatable="false">Humidity</string>
     <string name="clouds" translatable="false">Clouds</string>
+    <string name="met_sec" translatable="false">m/s</string>
+    <string name="hPa" translatable="false">hPa</string>
+    <string name="date_update" translatable="false">Update</string>
+
 
     <string name="weather_location" translatable="false">Weather Location</string>
     <string name="use_device_location" translatable="false">Use device location</string>
