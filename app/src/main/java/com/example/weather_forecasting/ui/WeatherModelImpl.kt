@@ -1,7 +1,7 @@
 package com.example.weather_forecasting.ui
 
 import android.content.Context
-import com.example.weather_forecasting.R
+import android.widget.Toast
 import com.example.weather_forecasting.data.network.response.TodayWeatherResponse
 import com.example.weather_forecasting.data.network.response.ForecastWeatherApiClient
 import com.example.weather_forecasting.data.network.response.ForecastWeatherService
@@ -12,17 +12,20 @@ class WeatherModelImpl (context: Context) : WeatherContract.Model {
 
     var context: Context = context
 
+
     private val weatherRestService: ForecastWeatherService =
         ForecastWeatherApiClient.getClient().create(ForecastWeatherService::class.java)
 
 
-    override fun initiateWeatherInfoCall(textToBeSearched: String): Observable<TodayWeatherResponse> {
-        return weatherRestService.getWeatherInfo(textToBeSearched, setLanguageSystem().toString(),"metric")
+    override fun initiateWeatherInfoCall(latitude: Double, longitude:Double ): Observable<TodayWeatherResponse> {
+        return weatherRestService.getWeatherInfo( setLanguageSystem().toString(),latitude, longitude,"metric")
     }
 
-    override fun fetchInvalidCityMessage(): String {
-        return context.getString(R.string.invalid_city)
+    override fun fetchInvalidCityMessage() {
+        Toast.makeText(context.applicationContext,"Неверный координаты",Toast.LENGTH_LONG).show()
+
     }
+
 
 
 
@@ -33,5 +36,6 @@ class WeatherModelImpl (context: Context) : WeatherContract.Model {
         }else languageCode="en"
         return languageCode
     }
+
 
 }

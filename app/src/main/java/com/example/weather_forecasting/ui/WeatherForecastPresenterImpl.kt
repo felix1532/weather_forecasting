@@ -1,7 +1,13 @@
 package com.example.weather_forecasting.ui
 
+import android.app.Activity
+import android.location.Location
+import android.util.Log
+import android.widget.Toast
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.data.network.response.TodayWeatherResponse
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
@@ -15,27 +21,43 @@ import java.util.*
 
 class WeatherForecastPresenterImpl (
     view: WeatherContract.View, model: WeatherContract.Model,
-    processThread: Scheduler, mainThread: Scheduler
+    processThread: Scheduler, mainThread: Scheduler , activity: Activity
 ): WeatherContract.Presenter {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     var view: WeatherContract.View = view
     var model: WeatherContract.Model = model
     var processThread: Scheduler = processThread
     var mainThread: Scheduler = mainThread
+    var activity:Activity = activity
+
 
     override fun init() {
         view.onInitView()
     }
 
+    override fun getForecastTodayByGeolocation( ) {
+        var mLocation: Location? = null
+        var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.activity)
 
-    override fun getWeatherData(textToBeSearched: String) {
-        if (!StringUtils.isBlank(textToBeSearched)) {
+            fusedLocationProviderClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    mLocation = location
+                    if (location != null) {
+                        getWeatherData(location.latitude,location.longitude)
+
+                    }
+                }
+
+    }
+
+    override fun getWeatherData(latitide:Double,longitude:Double) {
+        if (!StringUtils.isBlank(latitide.toString()) && !StringUtils.isBlank(longitude.toString())) {
             view.handleLoaderView(true)
             view.handleWeatherView(false)
             view.handleErrorView(false)
 
             compositeDisposable.add(
-                model.initiateWeatherInfoCall(textToBeSearched).subscribeOn(processThread).observeOn(
+                model.initiateWeatherInfoCall(latitide, longitude).subscribeOn(processThread).observeOn(
                     mainThread
                 ).subscribeWith(object : DisposableObserver<TodayWeatherResponse>() {
                     override fun onComplete() {

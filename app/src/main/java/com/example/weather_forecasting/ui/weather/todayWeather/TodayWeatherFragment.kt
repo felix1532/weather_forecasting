@@ -1,6 +1,9 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
+import android.app.Activity
+import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +17,8 @@ import com.example.weather_forecasting.ui.WeatherContract
 import com.example.weather_forecasting.ui.WeatherForecastPresenterImpl
 import com.example.weather_forecasting.ui.WeatherModelImpl
 import com.example.weather_forecasting.ui.base.ScopeFragment
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.today_weather_fragment.*
@@ -25,6 +30,9 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
 
     lateinit var presenter: WeatherContract.Presenter
     lateinit var model: WeatherContract.Model
+
+
+
 
     companion object {
         fun newInstance() =
@@ -45,14 +53,24 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
 
+
+        var mLocation: Location? = null
+        var fusedLocationProviderClient: FusedLocationProviderClient? = this.activity?.let {
+            LocationServices.getFusedLocationProviderClient(
+                it
+            )
+        }
+
+
+
         model = context?.applicationContext?.let { WeatherModelImpl(it) }!!
-        presenter = WeatherForecastPresenterImpl(this, model, Schedulers.io(), AndroidSchedulers.mainThread())
+        presenter = WeatherForecastPresenterImpl(this, model, Schedulers.io(), AndroidSchedulers.mainThread(), this.requireActivity())
         presenter.init()
-        presenter.getWeatherData("Витебск")
+        presenter.getForecastTodayByGeolocation()
 
 
         retry_main_view_fragment.setOnClickListener {
-            presenter.getWeatherData("Витебск")
+            presenter.getForecastTodayByGeolocation()
         }
 
 
@@ -62,7 +80,7 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
 
     }
 
-    override fun showErrorMessage(invalidCityMessage: String?) {
+    override fun showErrorMessage(invalidCityMessage: Unit) {
         Toast.makeText(activity, "Неверно указан город", Toast.LENGTH_SHORT).show()
     }
 
@@ -121,5 +139,11 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
     override fun handleErrorView(showErrorView: Boolean) {
         retry_main_view_fragment.visibility = if (showErrorView) View.VISIBLE else View.GONE
     }
+
+
+
+
+
+
 }
 
