@@ -1,4 +1,4 @@
-package com.example.weather_forecasting.data.db.entity
+package com.example.weather_forecasting.data.todayWeather.entity
 
 
 import com.google.gson.annotations.SerializedName
@@ -9,4 +9,5 @@ data class Weather(
     val icon: String,
     val id: Int,
     val main: String
+
 )

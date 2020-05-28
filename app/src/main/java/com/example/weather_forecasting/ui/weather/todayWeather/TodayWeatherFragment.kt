@@ -1,44 +1,27 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
-import android.app.Activity
-import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.weather_forecasting.R
-import com.example.weather_forecasting.data.db.entity.ForecastDataModel
 import com.example.weather_forecasting.ui.WeatherContract
-import com.example.weather_forecasting.ui.WeatherForecastPresenterImpl
 import com.example.weather_forecasting.ui.WeatherModelImpl
-import com.example.weather_forecasting.ui.base.ScopeFragment
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.today_weather_fragment.*
-import java.util.*
 
 
-class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
+class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
 
 
-    lateinit var presenter: WeatherContract.Presenter
+    lateinit var presenter: WeatherContract.PresenterTodayWeather
     lateinit var model: WeatherContract.Model
-
-
-
-
-    companion object {
-        fun newInstance() =
-            TodayWeatherFragment()
-    }
-
     private lateinit var viewModel: TodayWeatherViewModel
 
     override fun onCreateView(
@@ -46,6 +29,7 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.today_weather_fragment, container, false)
     }
 
@@ -53,42 +37,34 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
 
-
-        var mLocation: Location? = null
-        var fusedLocationProviderClient: FusedLocationProviderClient? = this.activity?.let {
-            LocationServices.getFusedLocationProviderClient(
-                it
-            )
-        }
-
-
-
         model = context?.applicationContext?.let { WeatherModelImpl(it) }!!
-        presenter = WeatherForecastPresenterImpl(this, model, Schedulers.io(), AndroidSchedulers.mainThread(), this.requireActivity())
-        presenter.init()
-        presenter.getForecastTodayByGeolocation()
-
-
-        retry_main_view_fragment.setOnClickListener {
-            presenter.getForecastTodayByGeolocation()
-        }
-
-
+        presenter =
+            TodayWeatherForecastPresenterImpl(
+                this,
+                model,
+                Schedulers.io(),
+                AndroidSchedulers.mainThread(),
+                context?.applicationContext!!
+            )
+        presenter.getGeolocation()
     }
 
-    override fun onInitView() {
+
+    override fun onResume() {
+        super.onResume()
+        retry_main_view_fragment.setOnClickListener {
+            presenter.getGeolocation()
+            handleErrorView(false)
+        }
 
     }
 
     override fun showErrorMessage(invalidCityMessage: Unit) {
-        Toast.makeText(activity, "Неверно указан город", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "" +
+                "", Toast.LENGTH_SHORT).show()
     }
 
 
-    override fun showForeCastData(forecastData: ArrayList<ForecastDataModel>) {
-
-        textView_humidity.text = forecastData.toString()
-    }
 
     override fun setInfoCurrentDay(
         cityName: String?,
@@ -120,6 +96,7 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
 
     }
 
+
     override fun handleLoaderView(showHandleLoader: Boolean) {
         if (showHandleLoader) {
             val rotation = AnimationUtils.loadAnimation(activity, R.anim.rotate)
@@ -138,10 +115,8 @@ class TodayWeatherFragment : ScopeFragment(), WeatherContract.View {
 
     override fun handleErrorView(showErrorView: Boolean) {
         retry_main_view_fragment.visibility = if (showErrorView) View.VISIBLE else View.GONE
+
     }
-
-
-
 
 
 

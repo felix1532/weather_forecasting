@@ -7,6 +7,8 @@
     tools:context=".ui.weather.todayWeather.TodayWeatherFragment"
     android:background="@drawable/bg_gradien">
 
+
+
     <RelativeLayout
         android:id="@+id/loader_main_view"
         android:layout_width="match_parent"
@@ -51,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="25dp"
-        android:visibility="visible"
+        android:visibility="gone"
         >
 
         <RelativeLayout
@@ -92,14 +94,7 @@
                 android:orientation="vertical"
                 android:layout_centerInParent="true">
 
-                <TextView
 
-                    android:id="@+id/textView_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="27dp"
-                    android:layout_gravity="center"
-                    android:text="Clear Sky"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -122,6 +117,15 @@
                     android:text="29°C"/>
                 </LinearLayout>
 
+                <TextView
+
+                    android:id="@+id/textView_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="27dp"
+                    android:layout_gravity="center"
+                    android:text="Clear Sky"
+                    />
 
 
             </LinearLayout>

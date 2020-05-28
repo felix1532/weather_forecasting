@@ -15,6 +15,8 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.weather_forecasting.R
+import com.example.weather_forecasting.ui.weather.todayWeather.TodayWeatherFragment
+import com.example.weather_forecasting.ui.weather.weekWeather.list.WeekWeatherFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val PERMISSION_REQUEST = 10
@@ -35,15 +37,17 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        today_weather_main_view = findViewById(R.id.today_weather_main_view)
+        errorViewRL = findViewById(R.id.retry_main_view)
+        todayWeatherMainView = findViewById(R.id.today_weather_main_view)
+
         if (ActivityCompat.checkSelfPermission(
                 this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermission()
         }
 
-        today_weather_main_view = findViewById(R.id.today_weather_main_view)
-        errorViewRL = findViewById(R.id.retry_main_view)
-        todayWeatherMainView = findViewById(R.id.today_weather_main_view)
 
         if (isOnline()) {
             todayWeatherMainView.visibility = View.VISIBLE
@@ -54,6 +58,8 @@ class MainActivity : AppCompatActivity(){
             errorViewRL.visibility = View.VISIBLE
 
         }
+
+
     }
 
 
@@ -88,6 +94,8 @@ class MainActivity : AppCompatActivity(){
         )
         this.recreate()
     }
+
+
 
 
 }

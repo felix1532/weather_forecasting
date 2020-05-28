@@ -1,77 +1,80 @@
-package com.example.weather_forecasting.ui
+package com.example.weather_forecasting.ui.weather.todayWeather
 
 import android.app.Activity
+import android.content.Context
 import android.location.Location
-import android.util.Log
-import android.widget.Toast
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.data.network.response.TodayWeatherResponse
+import com.example.weather_forecasting.ui.WeatherContract
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
-import org.apache.commons.lang3.StringUtils
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class WeatherForecastPresenterImpl (
-    view: WeatherContract.View, model: WeatherContract.Model,
-    processThread: Scheduler, mainThread: Scheduler , activity: Activity
-): WeatherContract.Presenter {
+class TodayWeatherForecastPresenterImpl (
+    viewToday: WeatherContract.TodayView,
+    model: WeatherContract.Model,
+    processThread: Scheduler,
+    mainThread: Scheduler,
+    context: Context
+): WeatherContract.PresenterTodayWeather {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-    var view: WeatherContract.View = view
+    var viewToday: WeatherContract.TodayView = viewToday
     var model: WeatherContract.Model = model
     var processThread: Scheduler = processThread
     var mainThread: Scheduler = mainThread
-    var activity:Activity = activity
+    var context:Context = context
 
 
-    override fun init() {
-        view.onInitView()
-    }
 
-    override fun getForecastTodayByGeolocation( ) {
+    override fun getGeolocation( ) {
         var mLocation: Location? = null
-        var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.activity)
+        var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
             fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     mLocation = location
                     if (location != null) {
-                        getWeatherData(location.latitude,location.longitude)
+                        getTodayWeatherData(location.latitude,location.longitude)
 
                     }
                 }
 
     }
 
-    override fun getWeatherData(latitide:Double,longitude:Double) {
-        if (!StringUtils.isBlank(latitide.toString()) && !StringUtils.isBlank(longitude.toString())) {
-            view.handleLoaderView(true)
-            view.handleWeatherView(false)
-            view.handleErrorView(false)
+
+
+    override fun getTodayWeatherData(latitude:Double,longitude:Double) {
+        if (latitude!=0.0 && longitude!=0.0) {
+            viewToday.handleLoaderView(true)
+            viewToday.handleWeatherView(false)
+            viewToday.handleErrorView(false)
+
+
 
             compositeDisposable.add(
-                model.initiateWeatherInfoCall(latitide, longitude).subscribeOn(processThread).observeOn(
+                model.todayWeatherInfoCall(latitude, longitude).subscribeOn(processThread).observeOn(
                     mainThread
                 ).subscribeWith(object : DisposableObserver<TodayWeatherResponse>() {
                     override fun onComplete() {
                     }
 
                     override fun onNext(todayWeatherResponse: TodayWeatherResponse) {
-                        handleInfoResponse(todayWeatherResponse)
+                        handleTodayInfoResponse(todayWeatherResponse)
                     }
 
                     override fun onError(e: Throwable) {
                         if (e is HttpException) {
                             try {
                                 val body = e.response().errorBody()!!.string()
-                                handleInfoResponse(
+                                handleTodayInfoResponse(
                                     Gson().fromJson(
                                         body, TodayWeatherResponse::class.java
                                     )
@@ -81,19 +84,19 @@ class WeatherForecastPresenterImpl (
                             }
 
                         } else {
-                            view.handleErrorView(true)
+                            viewToday.handleErrorView(true)
                         }
                     }
 
                 })
             )
         } else {
-            view.showErrorMessage(model.fetchInvalidCityMessage());
+            viewToday.showErrorMessage(model.fetchInvalidCord());
         }
     }
 
 
-    override fun handleInfoResponse(todayWeatherResponse: TodayWeatherResponse?) {
+    override fun handleTodayInfoResponse(todayWeatherResponse: TodayWeatherResponse?) {
 
         val cityName = todayWeatherResponse?.name
         val description = todayWeatherResponse?.weather?.get(0)?.description
@@ -107,15 +110,12 @@ class WeatherForecastPresenterImpl (
         val pressure = todayWeatherResponse?.main?.pressure
 
 
-
-
-
-        view.handleLoaderView(false)
-        view.handleWeatherView(true)
-        view.handleErrorView(false)
+        viewToday.handleLoaderView(false)
+        viewToday.handleWeatherView(true)
+        viewToday.handleErrorView(false)
         if (temperatures != null && sunset != null) {
             getDateTime()?.let {
-                view.setInfoCurrentDay(cityName,temperatures,
+                viewToday.setInfoCurrentDay(cityName,temperatures,
                     description?.let { firstLetterUppercase(it) },
                     formatSunriseSunsetDate(sunset),
                     formatSunriseSunsetDate(sunrise),
@@ -130,19 +130,6 @@ class WeatherForecastPresenterImpl (
 
         }
 
-//        val forecastData = ArrayList<ForecastDataModel>()
-//        if (cityName != null && description != null && temperatures != null && feelsLike != null && winSpeed != null && humidity != null && clouds != null)
-//            forecastData.add(
-//                ForecastDataModel(
-//                    cityName,
-//                    firstLetterUppercase(description),
-//                    temperatures,
-//                    feelsLike,
-//                    winSpeed,
-//                    humidity,
-//                    clouds
-//                )
-//            )
 
     }
 
@@ -214,12 +201,18 @@ class WeatherForecastPresenterImpl (
         return SimpleDateFormat("HH:mm", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) }).toString()
     }
 
+    override fun formatDateForForecastingWeather(long: Long?): String? {
+        val time = SimpleDateFormat("dd MMMM yyyy, HH:mm")
+        time.timeZone = TimeZone.getTimeZone("GMT")
+        return time.format(long?.times(1000)?.let { Date(it) }).toString()
+    }
+
+
     private fun getDateTime(): String? {
         val dateFormat: DateFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm")
         val date = Date()
         return dateFormat.format(date).toString()
     }
-
 
 
 

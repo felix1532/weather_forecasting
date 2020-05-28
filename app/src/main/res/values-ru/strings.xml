@@ -14,6 +14,7 @@
         <string name="met_sec" translatable="false">м/с</string>
         <string name="hPa" translatable="false">гПа</string>
         <string name="date_update" translatable="false">Обновлено</string>
+    <string name="forecasting_week" translatable="false">Прогноз на неделю</string>
 
         <string name="weather_location" translatable="false">Местоположение</string>
         <string name="use_device_location" translatable="false">Использовать местопожение устройства</string>

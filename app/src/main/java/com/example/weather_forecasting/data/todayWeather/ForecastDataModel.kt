@@ -1,4 +1,4 @@
-package com.example.weather_forecasting.data.db.entity
+package com.example.weather_forecasting.data.todayWeather.entity
 
 class ForecastDataModel(
     location_name: String,

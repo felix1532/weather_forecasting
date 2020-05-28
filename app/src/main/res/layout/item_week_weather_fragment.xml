@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="7dp"
+    android:background="@drawable/bg_gradien">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image_recycler_view"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/angle"
+            android:src="@drawable/sun_01" />
+
+        <TextView
+            android:id="@+id/time_text_recycler_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/image_recycler_view"
+            android:text="Default"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="15dp"
+            />
+        <TextView
+            android:id="@+id/description_text_recycler_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/time_text_recycler_view"
+            android:layout_toEndOf="@+id/image_recycler_view"
+            android:text="Default"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="15dp"
+            />
+        <TextView
+            android:id="@+id/temperature_recycler_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/time_text_recycler_view"
+            android:text="Default"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25dp"
+            />
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

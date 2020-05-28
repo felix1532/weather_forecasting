@@ -1,8 +1,6 @@
-package com.example.weather_forecasting.data.db.entity
+package com.example.weather_forecasting.data.todayWeather.entity
 
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 

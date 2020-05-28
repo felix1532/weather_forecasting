@@ -12,6 +12,7 @@
     <string name="met_sec" translatable="false">m/s</string>
     <string name="hPa" translatable="false">hPa</string>
     <string name="date_update" translatable="false">Update</string>
+    <string name="forecasting_week" translatable="false">Forecasting Week</string>
 
 
     <string name="weather_location" translatable="false">Weather Location</string>

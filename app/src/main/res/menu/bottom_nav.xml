@@ -10,10 +10,6 @@
         android:title="@string/weekWeatherForecasting"
         android:icon="@drawable/ic_brightness_2_black_24dp"
         />
-    <item
-        android:id="@+id/settingsFragment"
-        android:title="@string/setting"
-        android:icon="@drawable/ic_brightness_2_black_24dp"
-        />
+
 
 </menu>

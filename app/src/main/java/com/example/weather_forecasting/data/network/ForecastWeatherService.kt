@@ -14,4 +14,13 @@ interface ForecastWeatherService {
                        @Query(value = "lon") longitude:Double ,
                        @Query(value = "units") units:String = "metric"
     ): Observable<TodayWeatherResponse>
+
+
+
+    @GET("data/2.5/forecast?$API_KEY")
+    fun getForecastWeatherInfo(@Query (value = "lang") language: String,
+                       @Query(value = "lat") latitude:Double ,
+                       @Query(value = "lon") longitude:Double ,
+                       @Query(value = "units") units:String = "metric"
+    ): Observable<ForecastWeatherResponse>
 }

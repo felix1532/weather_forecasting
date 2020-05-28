@@ -13,15 +13,6 @@
     <fragment
         android:id="@+id/weekWeatherFragment"
         android:name="com.example.weather_forecasting.ui.weather.weekWeather.list.WeekWeatherFragment"
-        android:label="week_weather_fragment"
+        android:label="@string/forecasting_week"
         tools:layout="@layout/week_weather_fragment" />
-    <fragment
-        android:id="@+id/detailWeekWeatherFragment"
-        android:name="com.example.weather_forecasting.ui.weather.weekWeather.detail.DetailWeekWeatherFragment"
-        android:label="detail_week_weather_fragment"
-        tools:layout="@layout/detail_week_weather_fragment" />
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.weather_forecasting.ui.settings.SettingsFragment"
-        android:label="SettingsFragment" />
 </navigation>
