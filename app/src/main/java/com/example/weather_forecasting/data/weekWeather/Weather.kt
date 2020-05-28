@@ -2,7 +2,7 @@ package com.example.weather_forecasting.data.weekWeather
 
 
 data class Weather(
-    val description: String,
+    var description: String,
     val icon: String,
     var id: Int,
     val main: String,

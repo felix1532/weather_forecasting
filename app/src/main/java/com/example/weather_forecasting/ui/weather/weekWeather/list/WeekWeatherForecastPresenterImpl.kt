@@ -100,6 +100,7 @@ class WeekWeatherForecastPresenterImpl (
         val weekForecastingWeather: ArrayList<General?> = ArrayList()
         for (i in 0..forecastWeatherResponse?.list?.size!!-1)
         {
+            forecastWeatherResponse.list[i].weather[0].description = firstLetterUppercase(forecastWeatherResponse.list[i].weather[0].description)
             forecastWeatherResponse.list[i].weather[0].id_drawable_icon = getImageForCode(forecastWeatherResponse.list[i].weather[0].id)
             weekForecastingWeather.add(forecastWeatherResponse.list[i])
         }
