@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weather_forecasting.R
-import com.example.weather_forecasting.data.weekWeather.General
+import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
 import com.example.weather_forecasting.ui.WeatherModelImpl
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -44,15 +44,6 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.week_weather_fragment, container, false)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(WeekWeatherViewModel::class.java)
-
-
-
         model = context?.applicationContext?.let { WeatherModelImpl(it) }!!
         presenter =
             WeekWeatherForecastPresenterImpl(
@@ -64,6 +55,12 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
             )
         presenter.getGeolocation()
 
+        return inflater.inflate(R.layout.week_weather_fragment, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = ViewModelProviders.of(this).get(WeekWeatherViewModel::class.java)
 
     }
 
@@ -93,14 +90,15 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
     }
 
 
-    override fun infoForecastDaysForWeekFragment(weekForecastingWeather: ArrayList<General?>) {
+    override fun infoForecastDaysForWeekFragment(weekForecastingWeather: ArrayList<General?>, map: MutableMap< Int, String>) {
         day_recycler_view.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = ListAdapter(weekForecastingWeather)
+            adapter =
+                RecyclerViewAdapter(
+                    weekForecastingWeather,
+                    map
+                )
 
         }
     }
-
-
-
 }

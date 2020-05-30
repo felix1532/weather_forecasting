@@ -1,4 +1,4 @@
-package com.example.weather_forecasting.data.weekWeather
+package com.example.weather_forecasting.model.weekWeather
 
 
 data class City(

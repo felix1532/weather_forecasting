@@ -1,4 +1,4 @@
-package com.example.weather_forecasting.data.network.response
+package com.example.weather_forecasting.model.network.response
 
 import okhttp3.OkHttpClient
 import okhttp3.Request

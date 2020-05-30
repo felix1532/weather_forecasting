@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.today_weather_fragment.*
 
 class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
 
-
     lateinit var presenter: WeatherContract.PresenterTodayWeather
     lateinit var model: WeatherContract.Model
     private lateinit var viewModel: TodayWeatherViewModel
@@ -30,16 +29,8 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.today_weather_fragment, container, false)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
-
         model = context?.applicationContext?.let { WeatherModelImpl(it) }!!
-        presenter =
-            TodayWeatherForecastPresenterImpl(
+        presenter = TodayWeatherForecastPresenterImpl(
                 this,
                 model,
                 Schedulers.io(),
@@ -47,6 +38,15 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
                 context?.applicationContext!!
             )
         presenter.getGeolocation()
+
+        return inflater.inflate(R.layout.today_weather_fragment, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
+
+
     }
 
 

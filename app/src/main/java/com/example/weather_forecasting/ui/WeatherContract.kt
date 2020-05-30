@@ -1,15 +1,14 @@
 package com.example.weather_forecasting.ui
 
-import com.example.weather_forecasting.data.network.response.ForecastWeatherResponse
-import com.example.weather_forecasting.data.weekWeather.General
-import com.example.weather_forecasting.data.network.response.TodayWeatherResponse
+import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
+import com.example.weather_forecasting.model.weekWeather.General
+import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import io.reactivex.Observable
 
 interface WeatherContract
 {
 
     interface View {
-
           fun showErrorMessage(invalidCityMessage: Unit)
           fun handleLoaderView(showHandleLoader: Boolean)
           fun handleWeatherView(showWeatherView: Boolean)
@@ -17,7 +16,7 @@ interface WeatherContract
     }
 
     interface WeekView : View {
-        fun infoForecastDaysForWeekFragment (weekForecastingWeather: ArrayList<General?>)
+        fun infoForecastDaysForWeekFragment (weekForecastingWeather: ArrayList<General?>, map: MutableMap< Int, String>)
     }
 
     interface TodayView : View{
@@ -36,13 +35,12 @@ interface WeatherContract
         )
     }
 
-
-
     interface Presenter {
         fun destroyView()
         fun firstLetterUppercase (string: String) : String
         fun getImageForCode(code: Int?) :Int
-        fun formatSunriseSunsetDate(long: Long?) :String?
+        fun formatHoursMinutes(long: Long?) :String?
+        fun formatDateDayMonthYear(long: Long?): String?
         fun getGeolocation()
         fun formatDateForForecastingWeather(long: Long?): String?
     }
@@ -55,9 +53,10 @@ interface WeatherContract
     interface PresenterWeekWeather :Presenter{
         fun getForecastWeatherData(latitude:Double,longitude:Double)
         fun handleForecastInfoResponse(forecastWeatherResponse: ForecastWeatherResponse?)
+        fun getCurrentDate():String
+        fun getCurrentTime():String
+        fun getNameDayWeek(time:Long?):String
     }
-
-
 
     interface Model {
         fun fetchInvalidCord()

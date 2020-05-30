@@ -9,8 +9,6 @@
     android:animateLayoutChanges="true"
     >
 
-
-
 <RelativeLayout
     android:id="@+id/today_weather_main_view"
     android:layout_width="match_parent"
@@ -47,7 +45,6 @@
         android:background="@drawable/bg_gradien_reverse"
         android:layout_alignParentBottom="true"
         app:itemRippleColor="@color/colorPrimaryDark"
-
         />
 
 </RelativeLayout>

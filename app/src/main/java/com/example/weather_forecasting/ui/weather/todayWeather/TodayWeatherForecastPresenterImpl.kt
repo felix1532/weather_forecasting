@@ -1,10 +1,9 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
-import android.app.Activity
 import android.content.Context
 import android.location.Location
 import com.example.weather_forecasting.R
-import com.example.weather_forecasting.data.network.response.TodayWeatherResponse
+import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import com.example.weather_forecasting.ui.WeatherContract
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -32,8 +31,6 @@ class TodayWeatherForecastPresenterImpl (
     var mainThread: Scheduler = mainThread
     var context:Context = context
 
-
-
     override fun getGeolocation( ) {
         var mLocation: Location? = null
         var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
@@ -49,15 +46,11 @@ class TodayWeatherForecastPresenterImpl (
 
     }
 
-
-
     override fun getTodayWeatherData(latitude:Double,longitude:Double) {
         if (latitude!=0.0 && longitude!=0.0) {
             viewToday.handleLoaderView(true)
             viewToday.handleWeatherView(false)
             viewToday.handleErrorView(false)
-
-
 
             compositeDisposable.add(
                 model.todayWeatherInfoCall(latitude, longitude).subscribeOn(processThread).observeOn(
@@ -95,7 +88,6 @@ class TodayWeatherForecastPresenterImpl (
         }
     }
 
-
     override fun handleTodayInfoResponse(todayWeatherResponse: TodayWeatherResponse?) {
 
         val cityName = todayWeatherResponse?.name
@@ -117,8 +109,8 @@ class TodayWeatherForecastPresenterImpl (
             getDateTime()?.let {
                 viewToday.setInfoCurrentDay(cityName,temperatures,
                     description?.let { firstLetterUppercase(it) },
-                    formatSunriseSunsetDate(sunset),
-                    formatSunriseSunsetDate(sunrise),
+                    formatHoursMinutes(sunset),
+                    formatHoursMinutes(sunrise),
                     humidity ,
                     clouds,
                     winSpeed,
@@ -129,10 +121,7 @@ class TodayWeatherForecastPresenterImpl (
             }
 
         }
-
-
     }
-
 
     override fun firstLetterUppercase(string:String) : String {
         var stringFLUppercase = ""
@@ -142,7 +131,6 @@ class TodayWeatherForecastPresenterImpl (
         }
         return stringFLUppercase
     }
-
 
     override fun getImageForCode(code: Int?): Int = when (code) {
         200,230-> {
@@ -197,8 +185,12 @@ class TodayWeatherForecastPresenterImpl (
         }
     }
 
-    override fun formatSunriseSunsetDate(long: Long?): String? {
-        return SimpleDateFormat("HH:mm", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) }).toString()
+    override fun formatHoursMinutes(long: Long?): String {
+        return SimpleDateFormat("HH:mm", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) })
+    }
+
+    override fun formatDateDayMonthYear(long: Long?): String {
+        return SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) })
     }
 
     override fun formatDateForForecastingWeather(long: Long?): String? {
@@ -207,14 +199,11 @@ class TodayWeatherForecastPresenterImpl (
         return time.format(long?.times(1000)?.let { Date(it) }).toString()
     }
 
-
     private fun getDateTime(): String? {
         val dateFormat: DateFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm")
         val date = Date()
         return dateFormat.format(date).toString()
     }
-
-
 
     override fun destroyView() {
         compositeDisposable.dispose()

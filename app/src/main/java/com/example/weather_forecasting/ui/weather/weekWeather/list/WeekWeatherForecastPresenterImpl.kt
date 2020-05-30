@@ -2,9 +2,10 @@ package com.example.weather_forecasting.ui.weather.weekWeather.list
 
 import android.content.Context
 import android.location.Location
+import android.widget.Toast
 import com.example.weather_forecasting.R
-import com.example.weather_forecasting.data.network.response.ForecastWeatherResponse
-import com.example.weather_forecasting.data.weekWeather.General
+import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
+import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -12,15 +13,16 @@ import com.google.gson.Gson
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
+import org.apache.commons.lang3.mutable.Mutable
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+const val DAY = 86400
 
 class WeekWeatherForecastPresenterImpl (
-
     viewWeek: WeatherContract.WeekView,
     model: WeatherContract.Model,
     processThread: Scheduler,
@@ -47,17 +49,14 @@ class WeekWeatherForecastPresenterImpl (
 
                     }
                 }
-
     }
 
 
     override fun getForecastWeatherData(latitide:Double,longitude:Double) {
         if (latitide!=0.0 && longitude!=0.0) {
-            viewWeek.handleLoaderView(true)
-            viewWeek.handleWeatherView(false)
-            viewWeek.handleErrorView(false)
-
-
+//            viewWeek.handleLoaderView(true)
+//            viewWeek.handleWeatherView(false)
+//            viewWeek.handleErrorView(false)
 
             compositeDisposable.add(
                 model.forecastWeatherInfoCall(latitide, longitude).subscribeOn(processThread).observeOn(
@@ -98,17 +97,50 @@ class WeekWeatherForecastPresenterImpl (
 
     override fun handleForecastInfoResponse(forecastWeatherResponse: ForecastWeatherResponse?) {
         val weekForecastingWeather: ArrayList<General?> = ArrayList()
-        for (i in 0..forecastWeatherResponse?.list?.size!!-1)
+        val map: MutableMap< Int, String> = mutableMapOf()
+
+        for (i in 0..forecastWeatherResponse?.list?.size!!-2 )
         {
+            if(formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "00:00" ||
+                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "03:00"||
+                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "09:00"||
+                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "15:00"||
+                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "21:00")
+            {
+            forecastWeatherResponse.list[i].timeHoursMinutes = formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong())
+            forecastWeatherResponse.list[i].timeDayMonthYear = formatDateDayMonthYear(forecastWeatherResponse.list[i].dt.toLong())
             forecastWeatherResponse.list[i].weather[0].description = firstLetterUppercase(forecastWeatherResponse.list[i].weather[0].description)
             forecastWeatherResponse.list[i].weather[0].id_drawable_icon = getImageForCode(forecastWeatherResponse.list[i].weather[0].id)
             weekForecastingWeather.add(forecastWeatherResponse.list[i])
+            }
+        }
+
+
+        var counter:Boolean = false
+        map.put(0, context.resources.getString(R.string.todayWeatherForecasting))
+        for (i in 0..weekForecastingWeather?.size-1)
+        {
+            val todayDate : String = getCurrentDate()
+            if(weekForecastingWeather[i]?.timeDayMonthYear != todayDate &&
+                    weekForecastingWeather[i]?.timeHoursMinutes == "00:00"&&
+                    i !=weekForecastingWeather?.size-1)
+            {
+                if(!counter)
+                {
+                    map.put(i,context.getString(R.string.tomorrow))
+                    counter = true
+                }else
+                {
+                    map.put(i, firstLetterUppercase(getNameDayWeek(weekForecastingWeather[i]?.dt?.toLong())))
+                }
+
+            }
         }
 
         viewWeek.handleLoaderView(false)
         viewWeek.handleWeatherView(true)
         viewWeek.handleErrorView(false)
-        viewWeek.infoForecastDaysForWeekFragment(weekForecastingWeather)
+        viewWeek.infoForecastDaysForWeekFragment(weekForecastingWeather, map)
     }
 
 
@@ -175,8 +207,16 @@ class WeekWeatherForecastPresenterImpl (
         }
     }
 
-    override fun formatSunriseSunsetDate(long: Long?): String? {
-        return SimpleDateFormat("HH:mm", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) }).toString()
+    override fun formatHoursMinutes(long: Long?): String {
+        val time = SimpleDateFormat("HH:mm")
+        time.timeZone = TimeZone.getTimeZone("GMT")
+        return time.format(long?.times(1000)?.let { Date(it) }).toString()
+    }
+
+    override fun formatDateDayMonthYear(long: Long?): String {
+        val time = SimpleDateFormat("yyyy.MM.dd")
+        time.timeZone = TimeZone.getTimeZone("GMT")
+        return time.format(long?.times(1000)?.let { Date(it) }).toString()
     }
 
     override fun formatDateForForecastingWeather(long: Long?): String? {
@@ -185,14 +225,23 @@ class WeekWeatherForecastPresenterImpl (
         return time.format(long?.times(1000)?.let { Date(it) }).toString()
     }
 
-
-    private fun getDateTime(): String? {
-        val dateFormat: DateFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm")
+    override fun getCurrentDate():String{
+        val dateFormat: DateFormat = SimpleDateFormat("yyyy.MM.dd")
         val date = Date()
         return dateFormat.format(date).toString()
     }
 
+    override fun getCurrentTime():String {
+        val dateFormat: DateFormat = SimpleDateFormat("HH:mm")
+        val date = Date()
+        return dateFormat.format(date).toString()
+    }
 
+    override fun getNameDayWeek(time:Long?):String {
+        val dateFormat = SimpleDateFormat("EEEE")
+        dateFormat.timeZone = TimeZone.getTimeZone("GMT")
+        return dateFormat.format(time?.times(1000)?.let { Date(it) }).toString()
+    }
 
     override fun destroyView() {
         compositeDisposable.dispose()

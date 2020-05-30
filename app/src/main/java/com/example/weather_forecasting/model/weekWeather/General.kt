@@ -1,8 +1,9 @@
-package com.example.weather_forecasting.data.weekWeather
+package com.example.weather_forecasting.model.weekWeather
 
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
+import java.util.*
 
 data class General(
     val clouds: Clouds,
@@ -13,5 +14,7 @@ data class General(
     val rain: Rain,
     val sys: Sys,
     val weather: List<Weather>,
-    val wind: Wind
+    val wind: Wind,
+    var timeDayMonthYear:String,
+    var timeHoursMinutes:String
 ):Serializable

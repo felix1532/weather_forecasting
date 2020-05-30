@@ -2,10 +2,10 @@ package com.example.weather_forecasting.ui
 
 import android.content.Context
 import android.widget.Toast
-import com.example.weather_forecasting.data.network.response.ForecastWeatherResponse
-import com.example.weather_forecasting.data.network.response.TodayWeatherResponse
-import com.example.weather_forecasting.data.network.response.ForecastWeatherApiClient
-import com.example.weather_forecasting.data.network.response.ForecastWeatherService
+import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
+import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
+import com.example.weather_forecasting.model.network.response.ForecastWeatherApiClient
+import com.example.weather_forecasting.model.network.response.ForecastWeatherService
 import io.reactivex.Observable
 import java.util.*
 

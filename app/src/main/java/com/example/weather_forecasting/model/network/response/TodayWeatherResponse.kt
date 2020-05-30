@@ -1,6 +1,6 @@
-package com.example.weather_forecasting.data.network.response
+package com.example.weather_forecasting.model.network.response
 
-import com.example.weather_forecasting.data.todayWeather.entity.*
+import com.example.weather_forecasting.model.todayWeather.entity.*
 
 
 data class TodayWeatherResponse(

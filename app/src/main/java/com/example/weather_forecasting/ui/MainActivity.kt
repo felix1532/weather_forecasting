@@ -30,9 +30,6 @@ class MainActivity : AppCompatActivity(){
 
     lateinit var today_weather_main_view: RelativeLayout
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -58,8 +55,6 @@ class MainActivity : AppCompatActivity(){
             errorViewRL.visibility = View.VISIBLE
 
         }
-
-
     }
 
 
