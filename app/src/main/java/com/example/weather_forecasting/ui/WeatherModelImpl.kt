@@ -2,6 +2,7 @@ package com.example.weather_forecasting.ui
 
 import android.content.Context
 import android.widget.Toast
+import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import com.example.weather_forecasting.model.network.response.ForecastWeatherApiClient
@@ -28,9 +29,8 @@ class WeatherModelImpl (context: Context) : WeatherContract.Model {
     }
 
 
-    override fun fetchInvalidCord() {
-        Toast.makeText(context.applicationContext,"Не удалось определить местоположение",Toast.LENGTH_LONG).show()
-
+    override fun fetchInvalidCord(): String {
+        return context.resources.getString(R.string.failed_location)
     }
 
 

@@ -2,9 +2,13 @@ package com.example.weather_forecasting.ui.weather.weekWeather.list
 
 import android.content.Context
 import android.location.Location
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.widget.Toast
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
+import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -13,14 +17,12 @@ import com.google.gson.Gson
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
-import org.apache.commons.lang3.mutable.Mutable
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-const val DAY = 86400
 
 class WeekWeatherForecastPresenterImpl (
     viewWeek: WeatherContract.WeekView,
@@ -37,63 +39,70 @@ class WeekWeatherForecastPresenterImpl (
     var context:Context = context
 
 
-    override fun getGeolocation( ) {
+    override fun getDateFromGeolocation( ) {
         var mLocation: Location? = null
         var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
-            fusedLocationProviderClient.lastLocation
+        fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     mLocation = location
                     if (location != null) {
                         getForecastWeatherData(location.latitude,location.longitude)
-
                     }
                 }
     }
 
-
     override fun getForecastWeatherData(latitide:Double,longitude:Double) {
         if (latitide!=0.0 && longitude!=0.0) {
-//            viewWeek.handleLoaderView(true)
-//            viewWeek.handleWeatherView(false)
-//            viewWeek.handleErrorView(false)
+            viewWeek.handleLoaderView(true)
+            viewWeek.handleWeatherView(false)
+            viewWeek.handleErrorView(false)
 
-            compositeDisposable.add(
-                model.forecastWeatherInfoCall(latitide, longitude).subscribeOn(processThread).observeOn(
-                    mainThread
-                ).subscribeWith(object : DisposableObserver<ForecastWeatherResponse>() {
-                    override fun onComplete() {
-                    }
-
-                    override fun onNext(forecastWeatherResponse: ForecastWeatherResponse) {
-                        handleForecastInfoResponse(forecastWeatherResponse)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        if (e is HttpException) {
-                            try {
-                                val body = e.response().errorBody()!!.string()
-                                handleForecastInfoResponse(
-                                    Gson().fromJson(
-                                        body, ForecastWeatherResponse::class.java
-                                    )
-                                )
-                            } catch (e1: IOException) {
-                                e1.printStackTrace()
-                            }
-
-                        } else {
-                            viewWeek.handleErrorView(true)
+            if(isInternetAvailable(context))
+            {
+                compositeDisposable.add(
+                    model.forecastWeatherInfoCall(latitide, longitude).subscribeOn(processThread).observeOn(
+                        mainThread
+                    ).subscribeWith(object : DisposableObserver<ForecastWeatherResponse>() {
+                        override fun onComplete() {
                         }
-                    }
 
-                })
-            )
+                        override fun onNext(weekWeatherResponse: ForecastWeatherResponse) {
+                            handleForecastInfoResponse(weekWeatherResponse)
+                        }
+
+                        override fun onError(e: Throwable) {
+                            if (e is HttpException) {
+                                try {
+                                    val body = e.response().errorBody()!!.string()
+                                    handleForecastInfoResponse(
+                                        Gson().fromJson(
+                                            body, ForecastWeatherResponse::class.java
+                                        )
+                                    )
+                                } catch (e1: IOException) {
+                                    e1.printStackTrace()
+                                }
+
+                            } else {
+                                viewWeek.handleErrorView(true)
+                            }
+                        }
+
+                    })
+                )
+
+            }else{
+                viewWeek.handleLoaderView(false)
+                viewWeek.handleWeatherView(false)
+                viewWeek.handleErrorView(true)
+                Toast.makeText(context,context.resources.getString(R.string.turn_internet), Toast.LENGTH_LONG).show()
+            }
+
         } else {
             viewWeek.showErrorMessage(model.fetchInvalidCord());
         }
     }
-
 
     override fun handleForecastInfoResponse(forecastWeatherResponse: ForecastWeatherResponse?) {
         val weekForecastingWeather: ArrayList<General?> = ArrayList()
@@ -101,20 +110,13 @@ class WeekWeatherForecastPresenterImpl (
 
         for (i in 0..forecastWeatherResponse?.list?.size!!-2 )
         {
-            if(formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "00:00" ||
-                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "03:00"||
-                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "09:00"||
-                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "15:00"||
-                formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong()) == "21:00")
-            {
             forecastWeatherResponse.list[i].timeHoursMinutes = formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong())
             forecastWeatherResponse.list[i].timeDayMonthYear = formatDateDayMonthYear(forecastWeatherResponse.list[i].dt.toLong())
             forecastWeatherResponse.list[i].weather[0].description = firstLetterUppercase(forecastWeatherResponse.list[i].weather[0].description)
             forecastWeatherResponse.list[i].weather[0].id_drawable_icon = getImageForCode(forecastWeatherResponse.list[i].weather[0].id)
             weekForecastingWeather.add(forecastWeatherResponse.list[i])
-            }
-        }
 
+        }
 
         var counter:Boolean = false
         map.put(0, context.resources.getString(R.string.todayWeatherForecasting))
@@ -133,26 +135,22 @@ class WeekWeatherForecastPresenterImpl (
                 {
                     map.put(i, firstLetterUppercase(getNameDayWeek(weekForecastingWeather[i]?.dt?.toLong())))
                 }
-
             }
         }
-
         viewWeek.handleLoaderView(false)
         viewWeek.handleWeatherView(true)
         viewWeek.handleErrorView(false)
         viewWeek.infoForecastDaysForWeekFragment(weekForecastingWeather, map)
     }
 
-
-    override fun firstLetterUppercase(string:String) : String {
+    override fun firstLetterUppercase(string: String?): String {
         var stringFLUppercase = ""
-        stringFLUppercase += string.substring(0, 1).toUpperCase()
-        for (i in 1 until string.length) {
+        stringFLUppercase += string?.substring(0, 1)?.toUpperCase()
+        for (i in 1 until string!!.length) {
             stringFLUppercase +=string.substring(i,i+1)
         }
         return stringFLUppercase
     }
-
 
     override fun getImageForCode(code: Int?): Int = when (code) {
         200,230-> {
@@ -241,6 +239,35 @@ class WeekWeatherForecastPresenterImpl (
         val dateFormat = SimpleDateFormat("EEEE")
         dateFormat.timeZone = TimeZone.getTimeZone("GMT")
         return dateFormat.format(time?.times(1000)?.let { Date(it) }).toString()
+    }
+
+    override fun isInternetAvailable(context: Context?): Boolean {
+        var result = false
+        val connectivityManager = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val networkCapabilities = connectivityManager.activeNetwork ?: return false
+            val actNw =
+                connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+            result = when {
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.run {
+                connectivityManager.activeNetworkInfo?.run {
+                    result = when (type) {
+                        ConnectivityManager.TYPE_WIFI -> true
+                        ConnectivityManager.TYPE_MOBILE -> true
+                        ConnectivityManager.TYPE_ETHERNET -> true
+                        else -> false
+                    }
+
+                }
+            }
+        }
+        return result
     }
 
     override fun destroyView() {

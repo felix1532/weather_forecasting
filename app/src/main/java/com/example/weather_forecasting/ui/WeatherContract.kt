@@ -1,5 +1,6 @@
 package com.example.weather_forecasting.ui
 
+import android.content.Context
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
 import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
@@ -9,7 +10,7 @@ interface WeatherContract
 {
 
     interface View {
-          fun showErrorMessage(invalidCityMessage: Unit)
+          fun showErrorMessage(invalidCord: String)
           fun handleLoaderView(showHandleLoader: Boolean)
           fun handleWeatherView(showWeatherView: Boolean)
           fun handleErrorView(showErrorView: Boolean)
@@ -17,12 +18,13 @@ interface WeatherContract
 
     interface WeekView : View {
         fun infoForecastDaysForWeekFragment (weekForecastingWeather: ArrayList<General?>, map: MutableMap< Int, String>)
+
     }
 
     interface TodayView : View{
         fun setInfoCurrentDay(
             cityName: String?,
-            temperature: Double,
+            temperature: Double?,
             description:String?,
             sunset: String?,
             sunrise:String?,
@@ -31,23 +33,26 @@ interface WeatherContract
             winSpeed:Double?,
             id: Int?,
             pressure:Int?,
-            todayDate:String
+            todayDate:String?
         )
     }
 
     interface Presenter {
         fun destroyView()
-        fun firstLetterUppercase (string: String) : String
+        fun firstLetterUppercase (string: String?) : String
         fun getImageForCode(code: Int?) :Int
         fun formatHoursMinutes(long: Long?) :String?
         fun formatDateDayMonthYear(long: Long?): String?
-        fun getGeolocation()
+        fun getDateFromGeolocation()
         fun formatDateForForecastingWeather(long: Long?): String?
+        fun isInternetAvailable(context: Context?): Boolean
     }
 
     interface PresenterTodayWeather :Presenter{
         fun getTodayWeatherData(latitude:Double,longitude:Double)
         fun handleTodayInfoResponse(todayWeatherResponse: TodayWeatherResponse?)
+        fun getDateTime(): String?
+
     }
 
     interface PresenterWeekWeather :Presenter{
@@ -59,7 +64,7 @@ interface WeatherContract
     }
 
     interface Model {
-        fun fetchInvalidCord()
+        fun fetchInvalidCord() : String
         fun todayWeatherInfoCall(latitude:Double,longitude:Double): Observable<TodayWeatherResponse>
         fun forecastWeatherInfoCall(latitude:Double,longitude:Double): Observable<ForecastWeatherResponse>
         fun setLanguageSystem(): String?

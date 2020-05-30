@@ -1,5 +1,11 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +13,8 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.weather_forecasting.R
@@ -37,7 +45,7 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
                 AndroidSchedulers.mainThread(),
                 context?.applicationContext!!
             )
-        presenter.getGeolocation()
+        presenter.getDateFromGeolocation()
 
         return inflater.inflate(R.layout.today_weather_fragment, container, false)
     }
@@ -46,29 +54,22 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
 
-
     }
-
 
     override fun onResume() {
         super.onResume()
         retry_main_view_fragment.setOnClickListener {
-            presenter.getGeolocation()
-            handleErrorView(false)
+            presenter.getDateFromGeolocation()
         }
-
     }
 
-    override fun showErrorMessage(invalidCityMessage: Unit) {
-        Toast.makeText(activity, "" +
-                "", Toast.LENGTH_SHORT).show()
+    override fun showErrorMessage(invalidCord: String) {
+        Toast.makeText(activity, invalidCord.toString(), Toast.LENGTH_SHORT).show()
     }
-
-
 
     override fun setInfoCurrentDay(
         cityName: String?,
-        temperature: Double,
+        temperature: Double?,
         description: String?,
         sunset: String?,
         sunrise: String?,
@@ -77,10 +78,10 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         winSpeed: Double?,
         id: Int?,
         pressure: Int?,
-        todayDate: String
+        todayDate: String?
     ) {
         textView_name_location.text = cityName
-        textView_temperature.text= temperature.toInt().toString() + " ℃"
+        textView_temperature.text= temperature?.toInt().toString() + " ℃"
         textView_description.text = description
         textView_sunset.text = sunset
         textView_sunrise.text = sunrise
@@ -91,11 +92,7 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         }
         textView_pressure.text = pressure.toString()+ " ${resources.getString(R.string.hPa)}"
         updated_at.text =  "${resources.getString(R.string.date_update)}: " + todayDate
-
-
-
     }
-
 
     override fun handleLoaderView(showHandleLoader: Boolean) {
         if (showHandleLoader) {
@@ -118,7 +115,4 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
 
     }
 
-
-
 }
-

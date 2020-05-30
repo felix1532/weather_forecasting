@@ -28,22 +28,14 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
     lateinit var model: WeatherContract.Model
     private lateinit var viewModel: WeekWeatherViewModel
 
-
-
     companion object {
         fun newInstance(): WeekWeatherFragment = WeekWeatherFragment()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        retainInstance = true
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         model = context?.applicationContext?.let { WeatherModelImpl(it) }!!
         presenter =
             WeekWeatherForecastPresenterImpl(
@@ -53,7 +45,7 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
                 AndroidSchedulers.mainThread(),
                 context?.applicationContext!!
             )
-        presenter.getGeolocation()
+        presenter.getDateFromGeolocation()
 
         return inflater.inflate(R.layout.week_weather_fragment, container, false)
     }
@@ -64,7 +56,7 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
 
     }
 
-    override fun showErrorMessage(invalidCityMessage: Unit) {
+    override fun showErrorMessage(invalidCityMessage: String) {
         Toast.makeText(activity, "" +
                 "", Toast.LENGTH_SHORT).show()
     }
@@ -101,4 +93,6 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
 
         }
     }
+
+
 }

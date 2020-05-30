@@ -13,7 +13,7 @@
     android:id="@+id/today_weather_main_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone">
+    android:visibility="visible">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -48,27 +48,4 @@
         />
 
 </RelativeLayout>
-
-
-    <RelativeLayout
-        android:id="@+id/retry_main_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:drawableTop="@drawable/error"
-            android:gravity="center"
-            android:text="@string/retry"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/retry_text_size" />
-    </RelativeLayout>
-
-
-
 </RelativeLayout>

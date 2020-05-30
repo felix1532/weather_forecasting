@@ -2,6 +2,10 @@ package com.example.weather_forecasting.ui.weather.todayWeather
 
 import android.content.Context
 import android.location.Location
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.widget.Toast
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import com.example.weather_forecasting.ui.WeatherContract
@@ -13,11 +17,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
 import retrofit2.HttpException
 import java.io.IOException
+import java.lang.ref.WeakReference
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class TodayWeatherForecastPresenterImpl (
+
+class TodayWeatherForecastPresenterImpl(
     viewToday: WeatherContract.TodayView,
     model: WeatherContract.Model,
     processThread: Scheduler,
@@ -31,19 +37,14 @@ class TodayWeatherForecastPresenterImpl (
     var mainThread: Scheduler = mainThread
     var context:Context = context
 
-    override fun getGeolocation( ) {
-        var mLocation: Location? = null
+    override fun getDateFromGeolocation( ) {
         var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-
             fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
-                    mLocation = location
                     if (location != null) {
-                        getTodayWeatherData(location.latitude,location.longitude)
-
+                        getTodayWeatherData(location.latitude, location.longitude)
                     }
                 }
-
     }
 
     override fun getTodayWeatherData(latitude:Double,longitude:Double) {
@@ -52,37 +53,47 @@ class TodayWeatherForecastPresenterImpl (
             viewToday.handleWeatherView(false)
             viewToday.handleErrorView(false)
 
-            compositeDisposable.add(
-                model.todayWeatherInfoCall(latitude, longitude).subscribeOn(processThread).observeOn(
-                    mainThread
-                ).subscribeWith(object : DisposableObserver<TodayWeatherResponse>() {
-                    override fun onComplete() {
-                    }
-
-                    override fun onNext(todayWeatherResponse: TodayWeatherResponse) {
-                        handleTodayInfoResponse(todayWeatherResponse)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        if (e is HttpException) {
-                            try {
-                                val body = e.response().errorBody()!!.string()
-                                handleTodayInfoResponse(
-                                    Gson().fromJson(
-                                        body, TodayWeatherResponse::class.java
-                                    )
-                                )
-                            } catch (e1: IOException) {
-                                e1.printStackTrace()
-                            }
-
-                        } else {
-                            viewToday.handleErrorView(true)
+            if(isInternetAvailable(context))
+            {
+                compositeDisposable.add(
+                    model.todayWeatherInfoCall(latitude, longitude).subscribeOn(processThread).observeOn(
+                        mainThread
+                    ).subscribeWith(object : DisposableObserver<TodayWeatherResponse>() {
+                        override fun onComplete() {
                         }
-                    }
 
-                })
-            )
+                        override fun onNext(todayWeatherResponse: TodayWeatherResponse) {
+                            handleTodayInfoResponse(todayWeatherResponse)
+                        }
+
+                        override fun onError(e: Throwable) {
+                            if (e is HttpException) {
+                                try {
+                                    val body = e.response().errorBody()!!.string()
+                                    handleTodayInfoResponse(
+                                        Gson().fromJson(
+                                            body, TodayWeatherResponse::class.java
+                                        )
+                                    )
+                                } catch (e1: IOException) {
+                                    e1.printStackTrace()
+                                }
+
+                            } else {
+                                viewToday.handleErrorView(true)
+                            }
+                        }
+
+                    })
+                )
+
+            }else{
+                viewToday.handleLoaderView(false)
+                viewToday.handleWeatherView(false)
+                viewToday.handleErrorView(true)
+                Toast.makeText(context,context.resources.getString(R.string.turn_internet),Toast.LENGTH_LONG).show()
+            }
+
         } else {
             viewToday.showErrorMessage(model.fetchInvalidCord());
         }
@@ -123,11 +134,11 @@ class TodayWeatherForecastPresenterImpl (
         }
     }
 
-    override fun firstLetterUppercase(string:String) : String {
+    override fun firstLetterUppercase(string: String?): String {
         var stringFLUppercase = ""
-        stringFLUppercase += string.substring(0, 1).toUpperCase()
-        for (i in 1 until string.length) {
-            stringFLUppercase +=string.substring(i,i+1)
+        stringFLUppercase += string?.substring(0, 1)?.toUpperCase()
+        for (i in 1 until string!!.length) {
+            stringFLUppercase += string.substring(i,i+1)
         }
         return stringFLUppercase
     }
@@ -199,15 +210,44 @@ class TodayWeatherForecastPresenterImpl (
         return time.format(long?.times(1000)?.let { Date(it) }).toString()
     }
 
-    private fun getDateTime(): String? {
+    override fun getDateTime(): String? {
         val dateFormat: DateFormat = SimpleDateFormat("dd MMMM yyyy, HH:mm")
         val date = Date()
         return dateFormat.format(date).toString()
     }
 
+
+    override fun isInternetAvailable(context: Context?): Boolean {
+        var result = false
+        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val networkCapabilities = connectivityManager.activeNetwork ?: return false
+            val actNw =
+                connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+            result = when {
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.run {
+                connectivityManager.activeNetworkInfo?.run {
+                    result = when (type) {
+                        ConnectivityManager.TYPE_WIFI -> true
+                        ConnectivityManager.TYPE_MOBILE -> true
+                        ConnectivityManager.TYPE_ETHERNET -> true
+                        else -> false
+                    }
+
+                }
+            }
+        }
+        return result
+    }
+
     override fun destroyView() {
         compositeDisposable.dispose()
     }
-
 
 }
