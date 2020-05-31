@@ -1,10 +1,10 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
 import android.Manifest
-import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
+import android.location.GnssNavigationMessage
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,22 +14,26 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.checkCallingOrSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.weather_forecasting.R
+import com.example.weather_forecasting.model.network.response.PERMISSION_REQUEST
 import com.example.weather_forecasting.ui.WeatherContract
-import com.example.weather_forecasting.ui.WeatherModelImpl
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.today_weather_fragment.*
+import java.util.concurrent.TimeUnit
+
 
 
 class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
 
     lateinit var presenter: WeatherContract.PresenterTodayWeather
-    lateinit var model: WeatherContract.Model
     private lateinit var viewModel: TodayWeatherViewModel
+    var infoShare:String = ""
+    private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,22 +41,32 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         savedInstanceState: Bundle?
     ): View? {
 
-        model = context?.applicationContext?.let { WeatherModelImpl(it) }!!
-        presenter = TodayWeatherForecastPresenterImpl(
-                this,
-                model,
-                Schedulers.io(),
-                AndroidSchedulers.mainThread(),
-                context?.applicationContext!!
-            )
-        presenter.getDateFromGeolocation()
-
         return inflater.inflate(R.layout.today_weather_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
+
+        enable_geolocation?.setOnClickListener {
+            ActivityCompat.requestPermissions(requireActivity(), permissions, PERMISSION_REQUEST)
+        }
+        presenter = TodayWeatherForecastPresenterImpl(
+            this,
+            Schedulers.io(),
+            AndroidSchedulers.mainThread(),
+            context?.applicationContext!!
+        )
+        presenter.getDateFromGeolocation()
+
+        share_button.setOnClickListener {
+            val intent = Intent()
+            intent.action = Intent.ACTION_SEND
+            intent.putExtra(Intent.EXTRA_TEXT,infoShare)
+            intent.type = "text/plain"
+            startActivity(Intent.createChooser(intent,"${resources.getString(R.string.share)}: "))
+        }
+
 
     }
 
@@ -63,8 +77,8 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         }
     }
 
-    override fun showErrorMessage(invalidCord: String) {
-        Toast.makeText(activity, invalidCord.toString(), Toast.LENGTH_SHORT).show()
+    override fun showErrorMessage(message: String) {
+        Toast.makeText(activity, message.toString(), Toast.LENGTH_SHORT).show()
     }
 
     override fun setInfoCurrentDay(
@@ -81,7 +95,7 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         todayDate: String?
     ) {
         textView_name_location.text = cityName
-        textView_temperature.text= temperature?.toInt().toString() + " ℃"
+        textView_temperature.text= temperature?.toInt().toString()  + " ℃"
         textView_description.text = description
         textView_sunset.text = sunset
         textView_sunrise.text = sunrise
@@ -90,8 +104,16 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         if (id != null) {
             imageView_condition_icon.setImageResource(id)
         }
+
         textView_pressure.text = pressure.toString()+ " ${resources.getString(R.string.hPa)}"
         updated_at.text =  "${resources.getString(R.string.date_update)}: " + todayDate
+        infoShare = "${resources.getString(R.string.city_name)}: $cityName - $temperature ℃, $description" +
+                "\n${resources.getString(R.string.time_sunset)}: $sunset" +
+                "\n${resources.getString(R.string.time_sunrise)}: $sunrise" +
+                "\n${resources.getString(R.string.humidity)}: $humidity%"+
+                "\n${resources.getString(R.string.wind)}: $winSpeed ${resources.getString(R.string.met_sec)}"+
+                "\n${resources.getString(R.string.pressure)}: $pressure ${resources.getString(R.string.hPa)}"+
+                "\n${resources.getString(R.string.date)}: $todayDate"
     }
 
     override fun handleLoaderView(showHandleLoader: Boolean) {
@@ -112,7 +134,11 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
 
     override fun handleErrorView(showErrorView: Boolean) {
         retry_main_view_fragment.visibility = if (showErrorView) View.VISIBLE else View.GONE
-
     }
+
+    override fun showButtonEnableGeolocation(showButton:Boolean){
+        enable_geolocation.visibility = if(showButton) View.VISIBLE else View.GONE
+    }
+
 
 }

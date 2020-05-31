@@ -9,6 +9,7 @@
     android:animateLayoutChanges="true"
     >
 
+
 <RelativeLayout
     android:id="@+id/today_weather_main_view"
     android:layout_width="match_parent"

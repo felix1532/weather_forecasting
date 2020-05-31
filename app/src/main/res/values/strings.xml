@@ -4,7 +4,11 @@
     <string name="weekWeatherForecasting" translatable="false">5 Days</string>
     <string name="setting" translatable="false">Settings</string>
     <string name="turn_internet" translatable="false">Turn on the Internet</string>
-    <string name="feels_like" translatable="false">Feels Like</string>
+    <string name="city_name" translatable="false">City name</string>
+    <string name="time_sunset" translatable="false">Time sunset</string>
+    <string name="time_sunrise" translatable="false">Time sunrise</string>
+    <string name="pressure" translatable="false">Pressure</string>
+    <string name="date" translatable="false">Date</string>
     <string name="wind" translatable="false">Wind</string>
     <string name="humidity" translatable="false">Humidity</string>
     <string name="clouds" translatable="false">Clouds</string>
@@ -24,6 +28,8 @@
     <string name="tomorrow" translatable="false">Tomorrow</string>
     <string name="retry" translatable="false">Retry</string>
     <string name="enable_location" translatable="false">Enable location, Please!</string>
+    <string name="share" translatable="false">Share</string>
+    <string name="enable_location_button" translatable="false">Enable geolocation</string>
 
 
 </resources>

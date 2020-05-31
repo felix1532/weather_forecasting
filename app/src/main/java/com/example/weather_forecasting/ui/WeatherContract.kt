@@ -1,19 +1,23 @@
 package com.example.weather_forecasting.ui
 
 import android.content.Context
+import android.location.GnssNavigationMessage
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
 import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
+import com.example.weather_forecasting.model.todayWeather.entity.Coord
+import io.reactivex.BackpressureOverflowStrategy
 import io.reactivex.Observable
 
 interface WeatherContract
 {
 
     interface View {
-          fun showErrorMessage(invalidCord: String)
+          fun showErrorMessage(message: String)
           fun handleLoaderView(showHandleLoader: Boolean)
           fun handleWeatherView(showWeatherView: Boolean)
           fun handleErrorView(showErrorView: Boolean)
+          fun showButtonEnableGeolocation(showButton:Boolean)
     }
 
     interface WeekView : View {

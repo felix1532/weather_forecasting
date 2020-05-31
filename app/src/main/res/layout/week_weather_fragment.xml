@@ -24,7 +24,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/retry_main_view_fragment"
+        android:id="@+id/retry_main_view_fragment_week"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
@@ -39,6 +39,21 @@
             android:text="@string/retry"
             android:textColor="@android:color/white"
             android:textSize="@dimen/retry_text_size" />
+        <Button
+            android:visibility="gone"
+            android:id="@+id/enable_geolocation_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/angle_button"
+            android:textSize="15dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="60dp"
+            android:text="@string/enable_location_button"
+            android:textAllCaps="false"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textColor="@android:color/white"/>
     </RelativeLayout>
 
 

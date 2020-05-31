@@ -1,16 +1,20 @@
 package com.example.weather_forecasting.ui.weather.weekWeather.list
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
+import com.example.weather_forecasting.ui.WeatherModelImpl
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
@@ -26,30 +30,43 @@ import kotlin.collections.ArrayList
 
 class WeekWeatherForecastPresenterImpl (
     viewWeek: WeatherContract.WeekView,
-    model: WeatherContract.Model,
     processThread: Scheduler,
     mainThread: Scheduler,
     context: Context
 ): WeatherContract.PresenterWeekWeather {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     var viewWeek: WeatherContract.WeekView = viewWeek
-    var model: WeatherContract.Model = model
+    var model: WeatherContract.Model =  WeatherModelImpl(context)
     var processThread: Scheduler = processThread
     var mainThread: Scheduler = mainThread
     var context:Context = context
 
 
-    override fun getDateFromGeolocation( ) {
-        var mLocation: Location? = null
-        var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-
-        fusedLocationProviderClient.lastLocation
+    override fun getDateFromGeolocation() {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            viewWeek.showErrorMessage(context.resources.getString(R.string.enable_location))
+            viewWeek.handleErrorView(true)
+            viewWeek.handleLoaderView(false)
+            viewWeek.handleWeatherView(false)
+            viewWeek.showButtonEnableGeolocation(true)
+        }
+        else {
+            var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+            fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
-                    mLocation = location
                     if (location != null) {
-                        getForecastWeatherData(location.latitude,location.longitude)
+                        getForecastWeatherData(location.latitude, location.longitude)
                     }
                 }
+        }
+
     }
 
     override fun getForecastWeatherData(latitide:Double,longitude:Double) {
@@ -57,6 +74,7 @@ class WeekWeatherForecastPresenterImpl (
             viewWeek.handleLoaderView(true)
             viewWeek.handleWeatherView(false)
             viewWeek.handleErrorView(false)
+            viewWeek.showButtonEnableGeolocation(false)
 
             if(isInternetAvailable(context))
             {
@@ -96,13 +114,16 @@ class WeekWeatherForecastPresenterImpl (
                 viewWeek.handleLoaderView(false)
                 viewWeek.handleWeatherView(false)
                 viewWeek.handleErrorView(true)
+                viewWeek.showButtonEnableGeolocation(false)
                 Toast.makeText(context,context.resources.getString(R.string.turn_internet), Toast.LENGTH_LONG).show()
             }
 
         } else {
             viewWeek.showErrorMessage(model.fetchInvalidCord());
+            viewWeek.handleErrorView(true)
         }
     }
+
 
     override fun handleForecastInfoResponse(forecastWeatherResponse: ForecastWeatherResponse?) {
         val weekForecastingWeather: ArrayList<General?> = ArrayList()
@@ -140,6 +161,7 @@ class WeekWeatherForecastPresenterImpl (
         viewWeek.handleLoaderView(false)
         viewWeek.handleWeatherView(true)
         viewWeek.handleErrorView(false)
+        viewWeek.showButtonEnableGeolocation(false)
         viewWeek.infoForecastDaysForWeekFragment(weekForecastingWeather, map)
     }
 

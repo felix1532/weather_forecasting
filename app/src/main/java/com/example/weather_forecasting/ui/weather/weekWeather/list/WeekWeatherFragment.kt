@@ -1,5 +1,6 @@
 package com.example.weather_forecasting.ui.weather.weekWeather.list
 
+import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,25 +8,30 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weather_forecasting.R
+import com.example.weather_forecasting.model.network.response.PERMISSION_REQUEST
 import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
-import com.example.weather_forecasting.ui.WeatherModelImpl
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.today_weather_fragment.*
 import kotlinx.android.synthetic.main.today_weather_fragment.loader
 import kotlinx.android.synthetic.main.today_weather_fragment.loader_main_view
 import kotlinx.android.synthetic.main.today_weather_fragment.retry_main_view_fragment
 import kotlinx.android.synthetic.main.week_weather_fragment.*
+import kotlinx.coroutines.channels.consumesAll
+
 
 class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
 
 
+    private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
     lateinit var presenter: WeatherContract.PresenterWeekWeather
-    lateinit var model: WeatherContract.Model
     private lateinit var viewModel: WeekWeatherViewModel
 
     companion object {
@@ -36,16 +42,7 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        model = context?.applicationContext?.let { WeatherModelImpl(it) }!!
-        presenter =
-            WeekWeatherForecastPresenterImpl(
-                this,
-                model,
-                Schedulers.io(),
-                AndroidSchedulers.mainThread(),
-                context?.applicationContext!!
-            )
-        presenter.getDateFromGeolocation()
+
 
         return inflater.inflate(R.layout.week_weather_fragment, container, false)
     }
@@ -53,12 +50,29 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(WeekWeatherViewModel::class.java)
+        enable_geolocation_week?.setOnClickListener {
+            ActivityCompat.requestPermissions(requireActivity(), permissions, PERMISSION_REQUEST)
+        }
+        presenter =
+            WeekWeatherForecastPresenterImpl(
+                this,
+                Schedulers.io(),
+                AndroidSchedulers.mainThread(),
+                context?.applicationContext!!
+            )
+        presenter.getDateFromGeolocation()
 
     }
 
-    override fun showErrorMessage(invalidCityMessage: String) {
-        Toast.makeText(activity, "" +
-                "", Toast.LENGTH_SHORT).show()
+    override fun onResume() {
+        super.onResume()
+        retry_main_view_fragment_week.setOnClickListener {
+            presenter.getDateFromGeolocation()
+        }
+    }
+
+    override fun showErrorMessage(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun handleLoaderView(showHandleLoader: Boolean) {
@@ -78,7 +92,11 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
     }
 
     override fun handleErrorView(showErrorView: Boolean) {
-        retry_main_view_fragment.visibility = if (showErrorView) View.VISIBLE else View.GONE
+        retry_main_view_fragment_week.visibility = if (showErrorView) View.VISIBLE else View.GONE
+    }
+
+    override fun showButtonEnableGeolocation(showButton: Boolean) {
+        enable_geolocation_week.visibility = if(showButton) View.VISIBLE else View.GONE
     }
 
 

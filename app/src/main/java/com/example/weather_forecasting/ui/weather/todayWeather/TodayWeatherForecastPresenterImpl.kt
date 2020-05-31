@@ -1,14 +1,20 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.PermissionChecker
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
+import com.example.weather_forecasting.model.todayWeather.entity.Coord
 import com.example.weather_forecasting.ui.WeatherContract
+import com.example.weather_forecasting.ui.WeatherModelImpl
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
@@ -25,79 +31,101 @@ import java.util.*
 
 class TodayWeatherForecastPresenterImpl(
     viewToday: WeatherContract.TodayView,
-    model: WeatherContract.Model,
     processThread: Scheduler,
     mainThread: Scheduler,
     context: Context
 ): WeatherContract.PresenterTodayWeather {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     var viewToday: WeatherContract.TodayView = viewToday
-    var model: WeatherContract.Model = model
+    var model: WeatherContract.Model = WeatherModelImpl(context)
     var processThread: Scheduler = processThread
     var mainThread: Scheduler = mainThread
     var context:Context = context
+    private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     override fun getDateFromGeolocation( ) {
-        var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            viewToday.showErrorMessage(context.resources.getString(R.string.enable_location))
+            viewToday.handleErrorView(true)
+            viewToday.handleLoaderView(false)
+            viewToday.handleWeatherView(false)
+            viewToday.showButtonEnableGeolocation(true)
+        }
+        else
+        {
+            var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
             fusedLocationProviderClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    if (location != null) {
-                        getTodayWeatherData(location.latitude, location.longitude)
-                    }
+            .addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    getTodayWeatherData(location.latitude, location.longitude)
                 }
+            }
+        }
+
     }
 
     override fun getTodayWeatherData(latitude:Double,longitude:Double) {
-        if (latitude!=0.0 && longitude!=0.0) {
-            viewToday.handleLoaderView(true)
-            viewToday.handleWeatherView(false)
-            viewToday.handleErrorView(false)
-
-            if(isInternetAvailable(context))
-            {
-                compositeDisposable.add(
-                    model.todayWeatherInfoCall(latitude, longitude).subscribeOn(processThread).observeOn(
-                        mainThread
-                    ).subscribeWith(object : DisposableObserver<TodayWeatherResponse>() {
-                        override fun onComplete() {
-                        }
-
-                        override fun onNext(todayWeatherResponse: TodayWeatherResponse) {
-                            handleTodayInfoResponse(todayWeatherResponse)
-                        }
-
-                        override fun onError(e: Throwable) {
-                            if (e is HttpException) {
-                                try {
-                                    val body = e.response().errorBody()!!.string()
-                                    handleTodayInfoResponse(
-                                        Gson().fromJson(
-                                            body, TodayWeatherResponse::class.java
-                                        )
-                                    )
-                                } catch (e1: IOException) {
-                                    e1.printStackTrace()
-                                }
-
-                            } else {
-                                viewToday.handleErrorView(true)
-                            }
-                        }
-
-                    })
-                )
-
-            }else{
-                viewToday.handleLoaderView(false)
+            if (latitude != 0.0 && longitude != 0.0 ) {
+                viewToday.handleLoaderView(true)
                 viewToday.handleWeatherView(false)
-                viewToday.handleErrorView(true)
-                Toast.makeText(context,context.resources.getString(R.string.turn_internet),Toast.LENGTH_LONG).show()
-            }
+                viewToday.handleErrorView(false)
+                viewToday.showButtonEnableGeolocation(false)
 
-        } else {
-            viewToday.showErrorMessage(model.fetchInvalidCord());
+                if (isInternetAvailable(context)) {
+                    compositeDisposable.add(
+                        model.todayWeatherInfoCall(latitude, longitude).subscribeOn(processThread)
+                            .observeOn(
+                                mainThread
+                            ).subscribeWith(object : DisposableObserver<TodayWeatherResponse>() {
+                            override fun onComplete() {
+                            }
+
+                            override fun onNext(todayWeatherResponse: TodayWeatherResponse) {
+                                handleTodayInfoResponse(todayWeatherResponse)
+                            }
+
+                            override fun onError(e: Throwable) {
+                                if (e is HttpException) {
+                                    try {
+                                        val body = e.response().errorBody()!!.string()
+                                        handleTodayInfoResponse(
+                                            Gson().fromJson(
+                                                body, TodayWeatherResponse::class.java
+                                            )
+                                        )
+                                    } catch (e1: IOException) {
+                                        e1.printStackTrace()
+                                    }
+
+                                } else {
+                                    viewToday.handleErrorView(true)
+                                }
+                            }
+
+                        })
+                    )
+
+                } else {
+                    viewToday.handleLoaderView(false)
+                    viewToday.handleWeatherView(false)
+                    viewToday.handleErrorView(true)
+                    viewToday.showButtonEnableGeolocation(false)
+                    Toast.makeText(context, context.resources.getString(R.string.turn_internet), Toast.LENGTH_LONG).show()
+                }
+
+            } else {
+                viewToday.handleErrorView(true)
+                viewToday.showErrorMessage(model.fetchInvalidCord())
+            }
         }
-    }
+
 
     override fun handleTodayInfoResponse(todayWeatherResponse: TodayWeatherResponse?) {
 
@@ -112,10 +140,11 @@ class TodayWeatherForecastPresenterImpl(
         val id = todayWeatherResponse?.weather?.get(0)?.id
         val pressure = todayWeatherResponse?.main?.pressure
 
-
         viewToday.handleLoaderView(false)
         viewToday.handleWeatherView(true)
         viewToday.handleErrorView(false)
+        viewToday.showButtonEnableGeolocation(false
+        )
         if (temperatures != null && sunset != null) {
             getDateTime()?.let {
                 viewToday.setInfoCurrentDay(cityName,temperatures,

@@ -33,9 +33,6 @@ class WeatherModelImpl (context: Context) : WeatherContract.Model {
         return context.resources.getString(R.string.failed_location)
     }
 
-
-
-
     override fun setLanguageSystem(): String? {
         var languageCode:String
         if(Locale.getDefault().language.equals("ru")){
