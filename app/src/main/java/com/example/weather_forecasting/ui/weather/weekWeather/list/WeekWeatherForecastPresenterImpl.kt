@@ -7,11 +7,11 @@ import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
-import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
 import com.example.weather_forecasting.ui.WeatherModelImpl
@@ -127,42 +127,49 @@ class WeekWeatherForecastPresenterImpl (
 
     override fun handleForecastInfoResponse(forecastWeatherResponse: ForecastWeatherResponse?) {
         val weekForecastingWeather: ArrayList<General?> = ArrayList()
-        val map: MutableMap< Int, String> = mutableMapOf()
+        var count:Int =0
+        val namekDays: MutableMap<Int, String> = mutableMapOf()
 
-        for (i in 0..forecastWeatherResponse?.list?.size!!-2 )
+        weekForecastingWeather.add(forecastWeatherResponse?.list?.get(0))
+        for (i in 1..forecastWeatherResponse?.list?.size!!-1 )
         {
             forecastWeatherResponse.list[i].timeHoursMinutes = formatHoursMinutes(forecastWeatherResponse.list[i].dt.toLong())
             forecastWeatherResponse.list[i].timeDayMonthYear = formatDateDayMonthYear(forecastWeatherResponse.list[i].dt.toLong())
             forecastWeatherResponse.list[i].weather[0].description = firstLetterUppercase(forecastWeatherResponse.list[i].weather[0].description)
             forecastWeatherResponse.list[i].weather[0].id_drawable_icon = getImageForCode(forecastWeatherResponse.list[i].weather[0].id)
             weekForecastingWeather.add(forecastWeatherResponse.list[i])
-
+            if(weekForecastingWeather[i+count]?.timeHoursMinutes == "00:00" && i+count-1 != forecastWeatherResponse.list.size-1){
+                weekForecastingWeather.add(forecastWeatherResponse.list[i])
+                count+=1
+            }
         }
 
-        var counter:Boolean = false
-        map.put(0, context.resources.getString(R.string.todayWeatherForecasting))
-        for (i in 0..weekForecastingWeather?.size-1)
+        var flag:Boolean = false
+        namekDays.put(0, context.resources.getString(R.string.todayWeatherForecasting))
+        for (i in 1..weekForecastingWeather?.size-1)
         {
             val todayDate : String = getCurrentDate()
             if(weekForecastingWeather[i]?.timeDayMonthYear != todayDate &&
-                    weekForecastingWeather[i]?.timeHoursMinutes == "00:00"&&
-                    i !=weekForecastingWeather?.size-1)
+                weekForecastingWeather[i]?.timeHoursMinutes == "00:00"&&
+                weekForecastingWeather[i-1]?.timeHoursMinutes == "00:00" &&
+                i !=weekForecastingWeather?.size-1)
             {
-                if(!counter)
+                if(!flag)
                 {
-                    map.put(i,context.getString(R.string.tomorrow))
-                    counter = true
+                    namekDays.put(i, context.resources.getString(R.string.tomorrow))
+                    flag = true
                 }else
                 {
-                    map.put(i, firstLetterUppercase(getNameDayWeek(weekForecastingWeather[i]?.dt?.toLong())))
+                    namekDays.put(i, firstLetterUppercase(getNameDayWeek(weekForecastingWeather[i]?.dt?.toLong())))
                 }
             }
         }
+
         viewWeek.handleLoaderView(false)
         viewWeek.handleWeatherView(true)
         viewWeek.handleErrorView(false)
         viewWeek.showButtonEnableGeolocation(false)
-        viewWeek.infoForecastDaysForWeekFragment(weekForecastingWeather, map)
+        viewWeek.infoForecastDaysForWeekFragment(weekForecastingWeather, namekDays)
     }
 
     override fun firstLetterUppercase(string: String?): String {

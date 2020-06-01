@@ -41,7 +41,6 @@ class TodayWeatherForecastPresenterImpl(
     var processThread: Scheduler = processThread
     var mainThread: Scheduler = mainThread
     var context:Context = context
-    private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     override fun getDateFromGeolocation( ) {
         if (ActivityCompat.checkSelfPermission(

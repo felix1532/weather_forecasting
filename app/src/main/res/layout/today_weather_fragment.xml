@@ -7,14 +7,13 @@
     tools:context=".ui.weather.todayWeather.TodayWeatherFragment"
     android:background="@drawable/bg_gradien">
 
-
-
     <RelativeLayout
         android:id="@+id/loader_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:visibility="gone">
+
 
         <ImageView
             android:id="@+id/loader"
@@ -55,6 +54,7 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:textColor="@android:color/white"/>
+
     </RelativeLayout>
 
 

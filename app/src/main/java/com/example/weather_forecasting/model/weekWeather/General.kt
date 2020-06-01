@@ -17,4 +17,4 @@ data class General(
     val wind: Wind,
     var timeDayMonthYear:String,
     var timeHoursMinutes:String
-):Serializable
+)

@@ -12,7 +12,7 @@ import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.weekWeather.General
 import kotlin.collections.ArrayList
 
-class RecyclerViewAdapter (private val list: ArrayList<General?>, private val map: MutableMap< Int, String>): RecyclerView.Adapter<RecyclerViewAdapter.Companion.RecyclerViewHolder>() {
+class RecyclerViewAdapter(private val list: ArrayList<General?>, private val nameDays: MutableMap<Int, String>): RecyclerView.Adapter<RecyclerViewAdapter.Companion.RecyclerViewHolder>() {
 
 
     companion object{
@@ -78,10 +78,19 @@ class RecyclerViewAdapter (private val list: ArrayList<General?>, private val ma
     }
 
     override fun getItemViewType(position: Int): Int {
-        if(map.containsKey(position)){
+        if(position == 0)
+        {
             return TYPE_HEAD
         }
-        return TYPE_LIST
+        if(position>0){
+            if(list[position-1]?.timeHoursMinutes == list[position]?.timeHoursMinutes ){
+                return TYPE_HEAD
+            }
+                return TYPE_LIST
+        }else
+        {
+            return TYPE_LIST
+        }
     }
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int ) {
@@ -96,7 +105,7 @@ class RecyclerViewAdapter (private val list: ArrayList<General?>, private val ma
         }
         if(holder.ViewType == TYPE_HEAD){
             holder.mRelativeLayoutSection?.startAnimation(AnimationUtils.loadAnimation(holder.itemView.context ,R.anim.fade_transition_animation))
-            holder.mTextViewSection?.setText(map[position])
+            holder.mTextViewSection?.setText(nameDays.getValue(position))
         }
     }
 

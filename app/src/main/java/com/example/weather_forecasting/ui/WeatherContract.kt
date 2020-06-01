@@ -1,12 +1,9 @@
 package com.example.weather_forecasting.ui
 
 import android.content.Context
-import android.location.GnssNavigationMessage
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
 import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
-import com.example.weather_forecasting.model.todayWeather.entity.Coord
-import io.reactivex.BackpressureOverflowStrategy
 import io.reactivex.Observable
 
 interface WeatherContract
@@ -21,7 +18,7 @@ interface WeatherContract
     }
 
     interface WeekView : View {
-        fun infoForecastDaysForWeekFragment (weekForecastingWeather: ArrayList<General?>, map: MutableMap< Int, String>)
+        fun infoForecastDaysForWeekFragment (weekForecastingWeather: ArrayList<General?>, nameDays: MutableMap<Int, String>)
 
     }
 

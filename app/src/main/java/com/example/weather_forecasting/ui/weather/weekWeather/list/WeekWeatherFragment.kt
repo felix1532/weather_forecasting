@@ -1,6 +1,7 @@
 package com.example.weather_forecasting.ui.weather.weekWeather.list
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,12 +19,9 @@ import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.today_weather_fragment.*
 import kotlinx.android.synthetic.main.today_weather_fragment.loader
 import kotlinx.android.synthetic.main.today_weather_fragment.loader_main_view
-import kotlinx.android.synthetic.main.today_weather_fragment.retry_main_view_fragment
 import kotlinx.android.synthetic.main.week_weather_fragment.*
-import kotlinx.coroutines.channels.consumesAll
 
 
 class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
@@ -69,6 +67,11 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
         retry_main_view_fragment_week.setOnClickListener {
             presenter.getDateFromGeolocation()
         }
+        if (context?.let { ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) } == PackageManager.PERMISSION_GRANTED &&
+            context?.let { ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_COARSE_LOCATION) } == PackageManager.PERMISSION_GRANTED)
+        {
+            presenter.getDateFromGeolocation()
+        }
     }
 
     override fun showErrorMessage(message: String) {
@@ -100,13 +103,14 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
     }
 
 
-    override fun infoForecastDaysForWeekFragment(weekForecastingWeather: ArrayList<General?>, map: MutableMap< Int, String>) {
+    override fun infoForecastDaysForWeekFragment(weekForecastingWeather: ArrayList<General?>, nameDays: MutableMap<Int, String>) {
+
         day_recycler_view.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter =
                 RecyclerViewAdapter(
                     weekForecastingWeather,
-                    map
+                    nameDays
                 )
 
         }
