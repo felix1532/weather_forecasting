@@ -2,6 +2,7 @@ package com.example.weather_forecasting.ui.weather.todayWeather
 
 import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.ConnectivityManager
@@ -21,12 +22,14 @@ import com.google.gson.Gson
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
+import kotlinx.android.synthetic.main.today_weather_fragment.*
 import retrofit2.HttpException
 import java.io.IOException
 import java.lang.ref.WeakReference
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class TodayWeatherForecastPresenterImpl(
@@ -35,6 +38,7 @@ class TodayWeatherForecastPresenterImpl(
     mainThread: Scheduler,
     context: Context
 ): WeatherContract.PresenterTodayWeather {
+
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     var viewToday: WeatherContract.TodayView = viewToday
     var model: WeatherContract.Model = WeatherModelImpl(context)
@@ -105,6 +109,8 @@ class TodayWeatherForecastPresenterImpl(
 
                                 } else {
                                     viewToday.handleErrorView(true)
+                                    viewToday.handleLoaderView(false)
+                                    viewToday.handleWeatherView(false)
                                 }
                             }
 
@@ -118,7 +124,6 @@ class TodayWeatherForecastPresenterImpl(
                     viewToday.showButtonEnableGeolocation(false)
                     Toast.makeText(context, context.resources.getString(R.string.turn_internet), Toast.LENGTH_LONG).show()
                 }
-
             } else {
                 viewToday.handleErrorView(true)
                 viewToday.showErrorMessage(model.fetchInvalidCord())
@@ -131,8 +136,8 @@ class TodayWeatherForecastPresenterImpl(
         val cityName = todayWeatherResponse?.name
         val description = todayWeatherResponse?.weather?.get(0)?.description
         val temperatures = todayWeatherResponse?.main?.temp
-        val sunset = todayWeatherResponse?.sys?.sunset?.toLong()
-        val sunrise = todayWeatherResponse?.sys?.sunrise?.toLong()
+        val sunset = formatHoursMinutes(todayWeatherResponse?.sys?.sunset?.toLong())
+        val sunrise = formatHoursMinutes(todayWeatherResponse?.sys?.sunrise?.toLong())
         val winSpeed = todayWeatherResponse?.wind?.speed
         val humidity = todayWeatherResponse?.main?.humidity
         val clouds = todayWeatherResponse?.clouds?.all
@@ -142,14 +147,15 @@ class TodayWeatherForecastPresenterImpl(
         viewToday.handleLoaderView(false)
         viewToday.handleWeatherView(true)
         viewToday.handleErrorView(false)
-        viewToday.showButtonEnableGeolocation(false
-        )
+        viewToday.showButtonEnableGeolocation(false)
+
         if (temperatures != null && sunset != null) {
             getDateTime()?.let {
-                viewToday.setInfoCurrentDay(cityName,temperatures,
-                    description?.let { firstLetterUppercase(it) },
-                    formatHoursMinutes(sunset),
-                    formatHoursMinutes(sunrise),
+                viewToday.setInfoCurrentDay(cityName,
+                    temperatures,
+                    description?.let { firstLetterUppercase(it)},
+                    sunset,
+                    sunrise,
                     humidity ,
                     clouds,
                     winSpeed,
@@ -160,6 +166,9 @@ class TodayWeatherForecastPresenterImpl(
             }
 
         }
+
+
+
     }
 
     override fun firstLetterUppercase(string: String?): String {

@@ -51,8 +51,7 @@ class WeekWeatherFragment : Fragment(), WeatherContract.WeekView {
         enable_geolocation_week?.setOnClickListener {
             ActivityCompat.requestPermissions(requireActivity(), permissions, PERMISSION_REQUEST)
         }
-        presenter =
-            WeekWeatherForecastPresenterImpl(
+        presenter = WeekWeatherForecastPresenterImpl(
                 this,
                 Schedulers.io(),
                 AndroidSchedulers.mainThread(),

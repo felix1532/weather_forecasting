@@ -1,7 +1,9 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.PERMISSION_REQUEST
+import com.example.weather_forecasting.model.weekWeather.General
 import com.example.weather_forecasting.ui.WeatherContract
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -42,18 +45,20 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
         viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
 
         enable_geolocation?.setOnClickListener {
             ActivityCompat.requestPermissions(requireActivity(), permissions, PERMISSION_REQUEST)
         }
+
         presenter = TodayWeatherForecastPresenterImpl(
             this,
             Schedulers.io(),
             AndroidSchedulers.mainThread(),
-            context?.applicationContext!!
-        )
+            context?.applicationContext!!)
         presenter.getDateFromGeolocation()
+
 
         share_button.setOnClickListener {
             val intent = Intent()
@@ -63,14 +68,13 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
             startActivity(Intent.createChooser(intent, "${resources.getString(R.string.share)}: "))
         }
 
-
     }
 
 
     override fun onResume() {
         super.onResume()
         retry_main_view_fragment.setOnClickListener {
-            presenter.getDateFromGeolocation()
+            presenter?.getDateFromGeolocation()
         }
 
         if (context?.let {
@@ -85,27 +89,11 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             } == PackageManager.PERMISSION_GRANTED) {
-            presenter.getDateFromGeolocation()
+            presenter?.getDateFromGeolocation()
         }
-
-
-
 
     }
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        val wifiManager:WifiManager = context?.applicationContext?.getSystemService(Context.WIFI_SERVICE) as WifiManager
-//        val reciever = object : BroadcastReceiver(){
-//            override fun onReceive(context: Context?, intent: Intent?) {
-//                val wifiStateExtra = intent?.getIntExtra(WifiManager.EXTRA_WIFI_STATE,
-//                    WifiManager.WIFI_STATE_UNKNOWN)
-//                WifiManager.WIFI_STATE_ENABLED
-//            }
-//        }
-//
-//
-//    }
 
     override fun showErrorMessage(message: String) {
         Toast.makeText(activity, message.toString(), Toast.LENGTH_SHORT).show()
@@ -124,19 +112,17 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         pressure: Int?,
         todayDate: String?
     ) {
+
         textView_name_location.text = cityName
         textView_temperature.text = temperature?.toInt().toString() + " ℃"
         textView_description.text = description
         textView_sunset.text = sunset
         textView_sunrise.text = sunrise
-        textView_humidity.text =
-            "${resources.getString(R.string.humidity)} " + humidity.toString() + "%"
-        textView_speedWind.text = "${resources.getString(R.string.wind)} " + winSpeed?.toInt()
-            .toString() + "${resources.getString(R.string.met_sec)}"
+        textView_humidity.text = humidity.toString() + "%"
+        textView_speedWind.text = winSpeed?.toInt().toString() + " ${resources.getString(R.string.met_sec)}"
         if (id != null) {
             imageView_condition_icon.setImageResource(id)
         }
-
         textView_pressure.text = pressure.toString() + " ${resources.getString(R.string.hPa)}"
         updated_at.text = "${resources.getString(R.string.date_update)}: " + todayDate
         infoShare =

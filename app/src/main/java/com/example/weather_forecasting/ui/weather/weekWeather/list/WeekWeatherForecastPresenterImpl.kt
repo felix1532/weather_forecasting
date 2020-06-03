@@ -34,6 +34,7 @@ class WeekWeatherForecastPresenterImpl (
     mainThread: Scheduler,
     context: Context
 ): WeatherContract.PresenterWeekWeather {
+
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     var viewWeek: WeatherContract.WeekView = viewWeek
     var model: WeatherContract.Model =  WeatherModelImpl(context)
@@ -41,16 +42,10 @@ class WeekWeatherForecastPresenterImpl (
     var mainThread: Scheduler = mainThread
     var context:Context = context
 
-
     override fun getDateFromGeolocation() {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
             viewWeek.showErrorMessage(context.resources.getString(R.string.enable_location))
             viewWeek.handleErrorView(true)
             viewWeek.handleLoaderView(false)
@@ -144,15 +139,23 @@ class WeekWeatherForecastPresenterImpl (
             }
         }
 
+        for(i in weekForecastingWeather.size-count+1..weekForecastingWeather.size-1)
+        {
+            if(weekForecastingWeather[i]?.timeHoursMinutes == "00:00" ){
+                weekForecastingWeather.add(i,weekForecastingWeather[i])
+                break
+            }
+        }
+
         var flag:Boolean = false
         namekDays.put(0, context.resources.getString(R.string.todayWeatherForecasting))
-        for (i in 1..weekForecastingWeather?.size-1)
+        for (i in 1..weekForecastingWeather.size -1)
         {
             val todayDate : String = getCurrentDate()
             if(weekForecastingWeather[i]?.timeDayMonthYear != todayDate &&
                 weekForecastingWeather[i]?.timeHoursMinutes == "00:00"&&
                 weekForecastingWeather[i-1]?.timeHoursMinutes == "00:00" &&
-                i !=weekForecastingWeather?.size-1)
+                i != weekForecastingWeather.size -1)
             {
                 if(!flag)
                 {

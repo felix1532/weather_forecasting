@@ -1,6 +1,7 @@
 package com.example.weather_forecasting.model.network.response
 
 import com.example.weather_forecasting.model.todayWeather.entity.*
+import java.io.Serializable
 
 
 data class TodayWeatherResponse(
@@ -17,4 +18,4 @@ data class TodayWeatherResponse(
     val visibility: Int,
     val weather: List<Weather>,
     val wind: Wind
-)
+) :Serializable

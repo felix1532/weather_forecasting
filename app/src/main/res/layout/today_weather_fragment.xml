@@ -7,6 +7,7 @@
     tools:context=".ui.weather.todayWeather.TodayWeatherFragment"
     android:background="@drawable/bg_gradien">
 
+
     <RelativeLayout
         android:id="@+id/loader_main_view"
         android:layout_width="match_parent"
@@ -68,7 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="25dp"
-        android:visibility="gone"
+        android:visibility="visible"
         >
 
         <RelativeLayout
@@ -131,7 +132,7 @@
                     android:id="@+id/textView_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="27dp"
+                    android:textSize="23dp"
                     android:layout_gravity="center"
                     android:text="Clear Sky"
                     />
@@ -179,7 +180,7 @@
                         <ImageView
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:src="@drawable/sunrise"
+                            android:src="@drawable/humidity"
                             android:tint="#FFFFFF"/>
 
                         <Space
@@ -187,11 +188,11 @@
                             android:layout_height="5dp"/>
 
                         <TextView
-                            android:id="@+id/textView_sunrise"
+                            android:id="@+id/textView_humidity"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="13dp"
-                            android:text="Sunrise"/>
+                            android:text="Humidity"/>
 
 
 
@@ -213,7 +214,7 @@
                         <ImageView
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:src="@drawable/sunset"
+                            android:src="@drawable/pressure"
                             android:tint="#FFFFFF"/>
 
                         <Space
@@ -221,11 +222,11 @@
                             android:layout_height="5dp"/>
 
                         <TextView
-                            android:id="@+id/textView_sunset"
+                            android:id="@+id/textView_pressure"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="13dp"
-                            android:text="Sunset"/>
+                            android:text="@string/pressure"/>
 
 
                     </LinearLayout>
@@ -286,7 +287,7 @@
                         <ImageView
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:src="@drawable/pressure"
+                            android:src="@drawable/sunset"
                             android:tint="#FFFFFF"/>
 
                         <Space
@@ -294,10 +295,11 @@
                             android:layout_height="5dp"/>
 
                         <TextView
-                            android:id="@+id/textView_pressure"
+                            android:id="@+id/textView_sunset"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="13dp" android:text="Pressure"/>
+                            android:textSize="13dp"
+                            android:text="Sunset"/>
 
 
 
@@ -320,7 +322,7 @@
                         <ImageView
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:src="@drawable/humidity"
+                            android:src="@drawable/sunrise"
                             android:tint="#FFFFFF"/>
 
                         <Space
@@ -328,11 +330,11 @@
                             android:layout_height="5dp"/>
 
                         <TextView
-                            android:id="@+id/textView_humidity"
+                            android:id="@+id/textView_sunrise"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="13dp"
-                            android:text="Humidity"
+                            android:text="Sunrise"
                             android:maxLines="1"/>
 
 
