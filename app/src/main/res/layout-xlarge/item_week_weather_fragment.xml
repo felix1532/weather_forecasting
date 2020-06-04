@@ -24,7 +24,7 @@
             android:layout_marginLeft="40dp"
             android:layout_marginTop="15dp"
             android:text="Simple Title Text"
-            android:textColor="@color/title_text_color"
+            android:textColor="@color/colorWhite"
             android:textSize="60dp"
             android:textStyle="bold" />
 

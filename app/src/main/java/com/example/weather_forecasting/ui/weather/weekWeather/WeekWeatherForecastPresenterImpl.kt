@@ -98,6 +98,8 @@ class WeekWeatherForecastPresenterImpl (
 
                             } else {
                                 viewWeek.handleErrorView(true)
+                                viewWeek.handleWeatherView(false)
+                                viewWeek.handleLoaderView(false)
                             }
                         }
 
@@ -115,6 +117,8 @@ class WeekWeatherForecastPresenterImpl (
         } else {
             viewWeek.showErrorMessage(model.fetchInvalidCord());
             viewWeek.handleErrorView(true)
+            viewWeek.handleWeatherView(false)
+            viewWeek.handleErrorView(false)
         }
     }
 

@@ -123,6 +123,8 @@ class TodayWeatherForecastPresenterImpl(
                 }
             } else {
                 viewToday.handleErrorView(true)
+                viewToday.handleWeatherView(false)
+                viewToday.handleLoaderView(false)
                 viewToday.showErrorMessage(model.fetchInvalidCord())
             }
         }

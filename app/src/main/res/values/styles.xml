@@ -2,18 +2,18 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.Design.Light.NoActionBar">
-        <item name="colorPrimary">#EEEEEE</item>
-        <item name="colorPrimaryDark">#122259</item>
+        <item name="colorPrimary">@color/colorWhite</item>
+        <item name="colorPrimaryDark">@color/title_text_color</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/colorWhite</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:navigationBarColor">#122259</item>
+        <item name="android:navigationBarColor">@color/background_color</item>
     </style>
 
     <style name="ToolbarTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">#EEEEEE</item>
+        <item name="android:textColorSecondary">@color/colorWhite</item>
     </style>
 
 </resources>

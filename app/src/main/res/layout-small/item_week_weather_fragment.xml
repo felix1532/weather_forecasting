@@ -23,7 +23,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="5dp"
             android:text="Simple Title Text"
-            android:textColor="@color/title_text_color"
+            android:textColor="@color/colorWhite"
             android:textSize="20dp"
             android:textStyle="bold" />
 
