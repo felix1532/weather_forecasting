@@ -1,29 +1,17 @@
 package com.example.weather_forecasting.ui
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.Context
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.view.MenuItem
-import android.view.View
-import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupWithNavController
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.ui.weather.todayWeather.TodayWeatherFragment
-import com.example.weather_forecasting.ui.weather.weekWeather.list.WeekWeatherFragment
+import com.example.weather_forecasting.ui.weather.weekWeather.WeekWeatherFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
-
 
 
 class MainActivity : AppCompatActivity(){
@@ -63,11 +51,8 @@ class MainActivity : AppCompatActivity(){
                         active = weekWeatherFragment
                         return true
                     }
-
                 }
                 return false
             }
-
         }
-
 }

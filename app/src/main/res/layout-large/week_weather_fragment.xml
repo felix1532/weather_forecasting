@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.weather.weekWeather.WeekWeatherFragment"
+    android:background="@drawable/bg_gradien">
+
+
+    <RelativeLayout
+        android:id="@+id/loader_main_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/loader"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/loader"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/retry_main_view_fragment_week"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:drawableTop="@drawable/error"
+            android:gravity="center"
+            android:text="@string/retry"
+            android:textColor="@android:color/white"
+            android:textSize="60sp" />
+        <Button
+            android:visibility="gone"
+            android:id="@+id/enable_geolocation_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/angle_button"
+            android:textSize="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="60dp"
+            android:text="@string/enable_location_button"
+            android:textAllCaps="false"
+            android:padding="10dp"
+            android:textColor="@android:color/white"/>
+    </RelativeLayout>
+
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/day_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_week_weather_fragment"
+        android:visibility="gone"
+        >
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+</RelativeLayout>

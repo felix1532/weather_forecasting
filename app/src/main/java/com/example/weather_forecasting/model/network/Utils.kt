@@ -1,4 +1,4 @@
-package com.example.weather_forecasting.model.network.response
+package com.example.weather_forecasting.model.network
 
 val DEFAULT_CONNECT_TIMEOUT_IN_MS: Long = 2000
 val DEFAULT_WRITE_TIMEOUT_IN_MS: Long = 2000

@@ -2,7 +2,7 @@ package com.example.weather_forecasting.ui.weather.todayWeather
 
 import android.Manifest
 import android.content.Context
-import android.content.SharedPreferences
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.ConnectivityManager
@@ -10,10 +10,9 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.PermissionChecker
+import androidx.core.content.ContextCompat.startActivity
 import com.example.weather_forecasting.R
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
-import com.example.weather_forecasting.model.todayWeather.entity.Coord
 import com.example.weather_forecasting.ui.WeatherContract
 import com.example.weather_forecasting.ui.WeatherModelImpl
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -22,14 +21,11 @@ import com.google.gson.Gson
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
-import kotlinx.android.synthetic.main.today_weather_fragment.*
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.ref.WeakReference
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class TodayWeatherForecastPresenterImpl(
@@ -45,6 +41,7 @@ class TodayWeatherForecastPresenterImpl(
     var processThread: Scheduler = processThread
     var mainThread: Scheduler = mainThread
     var context:Context = context
+    var infoShare:String = ""
 
     override fun getDateFromGeolocation( ) {
         if (ActivityCompat.checkSelfPermission(
@@ -97,7 +94,7 @@ class TodayWeatherForecastPresenterImpl(
                             override fun onError(e: Throwable) {
                                 if (e is HttpException) {
                                     try {
-                                        val body = e.response().errorBody()!!.string()
+                                        val body = e.response()?.errorBody()!!.string()
                                         handleTodayInfoResponse(
                                             Gson().fromJson(
                                                 body, TodayWeatherResponse::class.java
@@ -130,7 +127,6 @@ class TodayWeatherForecastPresenterImpl(
             }
         }
 
-
     override fun handleTodayInfoResponse(todayWeatherResponse: TodayWeatherResponse?) {
 
         val cityName = todayWeatherResponse?.name
@@ -149,31 +145,54 @@ class TodayWeatherForecastPresenterImpl(
         viewToday.handleErrorView(false)
         viewToday.showButtonEnableGeolocation(false)
 
-        if (temperatures != null && sunset != null) {
+        if(cityName != null && description !=null && temperatures != null && winSpeed != null && humidity != null
+            && clouds != null && id != null && pressure !=null) {
             getDateTime()?.let {
-                viewToday.setInfoCurrentDay(cityName,
+                viewToday.setInfoCurrentDay(
+                    cityName,
                     temperatures,
-                    description?.let { firstLetterUppercase(it)},
+                    description?.let { firstLetterUppercase(it) },
                     sunset,
                     sunrise,
-                    humidity ,
+                    humidity,
                     clouds,
                     winSpeed,
                     getImageForCode(id),
-                    pressure ,
+                    pressure,
                     firstLetterUppercase(it)
                 )
+
+                infoShare =
+                    "${context.resources.getString(R.string.city_name)}: $cityName - $temperatures ℃, ${firstLetterUppercase(description)}" +
+                            "\n${context.resources.getString(R.string.time_sunset)}: $sunset" +
+                            "\n${context.resources.getString(R.string.time_sunrise)}: $sunrise" +
+                            "\n${context.resources.getString(R.string.humidity)}: $humidity%" +
+                            "\n${context.resources.getString(R.string.wind)}: $winSpeed ${context.resources.getString(R.string.met_sec)}" +
+                            "\n${context.resources.getString(R.string.pressure)}: $pressure ${context.resources.getString(R.string.hPa)}" +
+                            "\n${context.resources.getString(R.string.date)}: ${firstLetterUppercase(getDateTime())}"
             }
-
+        }else
+        {
+            viewToday.handleLoaderView(false)
+            viewToday.handleWeatherView(false)
+            viewToday.handleErrorView(true)
+            viewToday.showButtonEnableGeolocation(false)
         }
-
 
 
     }
 
+    override fun getStringFroShareButton(){
+        val intent = Intent()
+        intent.action = Intent.ACTION_SEND
+        intent.putExtra(Intent.EXTRA_TEXT, infoShare)
+        intent.type = "text/plain"
+        context.startActivity(Intent.createChooser(intent, "${context.resources.getString(R.string.share)}: "))
+    }
+
     override fun firstLetterUppercase(string: String?): String {
         var stringFLUppercase = ""
-        stringFLUppercase += string?.substring(0, 1)?.toUpperCase()
+        stringFLUppercase += string?.substring(0, 1)?.toUpperCase(Locale.ROOT)
         for (i in 1 until string!!.length) {
             stringFLUppercase += string.substring(i,i+1)
         }
@@ -216,7 +235,7 @@ class TodayWeatherForecastPresenterImpl(
         }
         701,711,721,731,741,751,761,762,771,781,782,783,784,785,786,787,788,789,790,791,792,793,
         794,795,796,797,798,799-> {
-            R.drawable.tornado
+            R.drawable.clouds_01
         }
         800 -> {
             R.drawable.clouds_01
@@ -234,14 +253,23 @@ class TodayWeatherForecastPresenterImpl(
     }
 
     override fun formatHoursMinutes(long: Long?): String {
-        return SimpleDateFormat("HH:mm", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) })
+        return if(long != null){
+            SimpleDateFormat("HH:mm", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) })
+        }else{
+            return "null"
+        }
     }
 
     override fun formatDateDayMonthYear(long: Long?): String {
-        return SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(long?.times(1000)?.let { Date(it) })
+        return return if(long!= null) {
+            SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH).format(
+                long?.times(1000)?.let { Date(it) })
+        }else{
+            "null"
+        }
     }
 
-    override fun formatDateForForecastingWeather(long: Long?): String? {
+    override fun formatDateForForecastingWeatherUpdate(long: Long?): String? {
         val time = SimpleDateFormat("dd MMMM yyyy, HH:mm")
         time.timeZone = TimeZone.getTimeZone("GMT")
         return time.format(long?.times(1000)?.let { Date(it) }).toString()
@@ -281,10 +309,6 @@ class TodayWeatherForecastPresenterImpl(
             }
         }
         return result
-    }
-
-    override fun destroyView() {
-        compositeDisposable.dispose()
     }
 
 }

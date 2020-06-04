@@ -1,9 +1,7 @@
 package com.example.weather_forecasting.ui.weather.todayWeather
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,8 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.example.weather_forecasting.R
-import com.example.weather_forecasting.model.network.response.PERMISSION_REQUEST
-import com.example.weather_forecasting.model.weekWeather.General
+import com.example.weather_forecasting.model.network.PERMISSION_REQUEST
 import com.example.weather_forecasting.ui.WeatherContract
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -28,25 +25,24 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
 
     lateinit var presenter: WeatherContract.PresenterTodayWeather
     private lateinit var viewModel: TodayWeatherViewModel
-    var infoShare: String = ""
-    private var permissions = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
-    )
+
+    private var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.today_weather_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         viewModel = ViewModelProviders.of(this).get(TodayWeatherViewModel::class.java)
+
+        if(!checkPermissionGeolocation()){
+            ActivityCompat.requestPermissions(requireActivity(), permissions, PERMISSION_REQUEST)
+        }
 
         enable_geolocation?.setOnClickListener {
             ActivityCompat.requestPermissions(requireActivity(), permissions, PERMISSION_REQUEST)
@@ -59,41 +55,22 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
             context?.applicationContext!!)
         presenter.getDateFromGeolocation()
 
-
         share_button.setOnClickListener {
-            val intent = Intent()
-            intent.action = Intent.ACTION_SEND
-            intent.putExtra(Intent.EXTRA_TEXT, infoShare)
-            intent.type = "text/plain"
-            startActivity(Intent.createChooser(intent, "${resources.getString(R.string.share)}: "))
+            (presenter as TodayWeatherForecastPresenterImpl).getStringFroShareButton()
         }
-
     }
 
 
     override fun onResume() {
         super.onResume()
         retry_main_view_fragment.setOnClickListener {
-            presenter?.getDateFromGeolocation()
+            presenter.getDateFromGeolocation()
         }
-
-        if (context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            } == PackageManager.PERMISSION_GRANTED &&
-            context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            } == PackageManager.PERMISSION_GRANTED) {
-            presenter?.getDateFromGeolocation()
+        if(checkPermissionGeolocation()) {
+            presenter.getDateFromGeolocation()
         }
 
     }
-
 
     override fun showErrorMessage(message: String) {
         Toast.makeText(activity, message.toString(), Toast.LENGTH_SHORT).show()
@@ -125,14 +102,6 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
         }
         textView_pressure.text = pressure.toString() + " ${resources.getString(R.string.hPa)}"
         updated_at.text = "${resources.getString(R.string.date_update)}: " + todayDate
-        infoShare =
-            "${resources.getString(R.string.city_name)}: $cityName - $temperature ℃, $description" +
-                    "\n${resources.getString(R.string.time_sunset)}: $sunset" +
-                    "\n${resources.getString(R.string.time_sunrise)}: $sunrise" +
-                    "\n${resources.getString(R.string.humidity)}: $humidity%" +
-                    "\n${resources.getString(R.string.wind)}: $winSpeed ${resources.getString(R.string.met_sec)}" +
-                    "\n${resources.getString(R.string.pressure)}: $pressure ${resources.getString(R.string.hPa)}" +
-                    "\n${resources.getString(R.string.date)}: $todayDate"
     }
 
     override fun handleLoaderView(showHandleLoader: Boolean) {
@@ -158,5 +127,11 @@ class TodayWeatherFragment : Fragment(), WeatherContract.TodayView {
     override fun showButtonEnableGeolocation(showButton: Boolean) {
         enable_geolocation.visibility = if (showButton) View.VISIBLE else View.GONE
     }
+
+    override fun checkPermissionGeolocation (): Boolean {
+        return context?.let { ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) } == PackageManager.PERMISSION_GRANTED &&
+                context?.let { ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_COARSE_LOCATION) } == PackageManager.PERMISSION_GRANTED
+    }
+
 
 }

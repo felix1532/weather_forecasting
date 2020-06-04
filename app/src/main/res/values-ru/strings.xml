@@ -25,7 +25,7 @@
         <string name="today" translatable="false">Сегодня</string>
         <string name="tomorrow" translatable="false">Завтра</string>
         <string name="retry" translatable="false">Повторить</string>
-        <string name="enable_location" translatable="false">Пожалуйста, включите местоположение!</string>
+        <string name="enable_location" translatable="false">Пожалуйста, включите геолокацию!</string>
         <string name="share" translatable="false">Поделиться</string>
     <string name="enable_location_button" translatable="false">Включить геолокацию</string>
 

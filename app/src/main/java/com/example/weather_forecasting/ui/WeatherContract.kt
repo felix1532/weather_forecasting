@@ -2,7 +2,7 @@ package com.example.weather_forecasting.ui
 
 import android.content.Context
 import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
-import com.example.weather_forecasting.model.weekWeather.General
+import com.example.weather_forecasting.model.modelWeekWeather.General
 import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import io.reactivex.Observable
 
@@ -18,8 +18,7 @@ interface WeatherContract
     }
 
     interface WeekView : View {
-        fun infoForecastDaysForWeekFragment (weekForecastingWeather: ArrayList<General?>, nameDays: MutableMap<Int, String>)
-
+        fun setInfoWeekDays (weekForecastingWeather: ArrayList<General?>, nameDays: MutableMap<Int, String>)
     }
 
     interface TodayView : View{
@@ -36,16 +35,16 @@ interface WeatherContract
             pressure:Int?,
             todayDate:String?
         )
+        fun checkPermissionGeolocation () :Boolean
     }
 
     interface Presenter {
-        fun destroyView()
         fun firstLetterUppercase (string: String?) : String
         fun getImageForCode(code: Int?) :Int
         fun formatHoursMinutes(long: Long?) :String?
         fun formatDateDayMonthYear(long: Long?): String?
         fun getDateFromGeolocation()
-        fun formatDateForForecastingWeather(long: Long?): String?
+        fun formatDateForForecastingWeatherUpdate(long: Long?): String?
         fun isInternetAvailable(context: Context?): Boolean
     }
 
@@ -53,6 +52,7 @@ interface WeatherContract
         fun getTodayWeatherData(latitude:Double,longitude:Double)
         fun handleTodayInfoResponse(todayWeatherResponse: TodayWeatherResponse?)
         fun getDateTime(): String?
+        fun getStringFroShareButton()
 
     }
 

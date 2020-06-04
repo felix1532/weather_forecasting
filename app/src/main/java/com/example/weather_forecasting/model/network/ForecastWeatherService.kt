@@ -1,5 +1,7 @@
-package com.example.weather_forecasting.model.network.response
+package com.example.weather_forecasting.model.network
 
+import com.example.weather_forecasting.model.network.response.ForecastWeatherResponse
+import com.example.weather_forecasting.model.network.response.TodayWeatherResponse
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -14,7 +16,6 @@ interface ForecastWeatherService {
                        @Query(value = "lon") longitude:Double ,
                        @Query(value = "units") units:String = "metric"
     ): Observable<TodayWeatherResponse>
-
 
 
     @GET("data/2.5/forecast?$API_KEY")

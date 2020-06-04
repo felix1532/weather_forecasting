@@ -1,6 +1,6 @@
 package com.example.weather_forecasting.model.network.response
 
-import com.example.weather_forecasting.model.todayWeather.entity.*
+import com.example.weather_forecasting.model.modelTodayWeather.entity.*
 import java.io.Serializable
 
 
