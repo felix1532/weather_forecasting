@@ -7,6 +7,7 @@ import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.weather_forecasting.R
@@ -142,16 +143,18 @@ class WeekWeatherForecastPresenterImpl (
                 }
             }
 
-            for (i in weekForecastingWeather.size - count + 1..weekForecastingWeather.size - 1) {
-                if (weekForecastingWeather[i]?.timeHoursMinutes == "00:00") {
-                    weekForecastingWeather.add(i, weekForecastingWeather[i])
-                    break
-                }
-            }
+
+
+//            for (i in weekForecastingWeather.size - count + 1..weekForecastingWeather.size - 1) {
+//                if (weekForecastingWeather[i]?.timeHoursMinutes == "00:00") {
+//                    weekForecastingWeather.add(i, weekForecastingWeather[i])
+//                    break
+//                }
+//            }
 
             var flag: Boolean = false
             namekDays.put(0, context.resources.getString(R.string.todayWeatherForecasting))
-            for (i in 1..weekForecastingWeather.size - 1) {
+            for (i in 1..weekForecastingWeather.size-1) {
                 val todayDate: String = getCurrentDate()
                 if (weekForecastingWeather[i]?.timeDayMonthYear != todayDate &&
                     weekForecastingWeather[i]?.timeHoursMinutes == "00:00" &&
