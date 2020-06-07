@@ -27,6 +27,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.sign
 
 class WeekWeatherForecastPresenterImpl (
     viewWeek: WeatherContract.WeekView,
@@ -137,20 +138,12 @@ class WeekWeatherForecastPresenterImpl (
                 forecastWeatherResponse.list[i].weather[0].description = firstLetterUppercase(forecastWeatherResponse.list[i].weather[0].description)
                 forecastWeatherResponse.list[i].weather[0].id_drawable_icon = getImageForCode(forecastWeatherResponse.list[i].weather[0].id)
                 weekForecastingWeather.add(forecastWeatherResponse.list[i])
-                if (weekForecastingWeather[i + count]?.timeHoursMinutes == "00:00" && i + count - 1 != forecastWeatherResponse.list.size - 1) {
+                if (weekForecastingWeather[i+count]?.timeHoursMinutes == "00:00" && forecastWeatherResponse.list[forecastWeatherResponse.list.size-1].timeHoursMinutes != "00:00") {
                     weekForecastingWeather.add(forecastWeatherResponse.list[i])
                     count += 1
                 }
             }
 
-
-
-//            for (i in weekForecastingWeather.size - count + 1..weekForecastingWeather.size - 1) {
-//                if (weekForecastingWeather[i]?.timeHoursMinutes == "00:00") {
-//                    weekForecastingWeather.add(i, weekForecastingWeather[i])
-//                    break
-//                }
-//            }
 
             var flag: Boolean = false
             namekDays.put(0, context.resources.getString(R.string.todayWeatherForecasting))
